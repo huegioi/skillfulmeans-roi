@@ -247,21 +247,9 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         </div>
       </div>
 
-      <!-- Card 2: Program & Operational -->
+      <!-- Card 2: Operational Metrics -->
       <div class="bg-white rounded-[2.5rem] border border-stone-200 p-8 shadow-sm space-y-6">
-        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">2</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Program &amp; Operational Metrics</h3></div>
-
-        <!-- PARTICIPATION RATE - KEY INPUT -->
-        <div class="bg-brand-teal/5 border border-brand-teal/20 rounded-2xl p-5">
-          <div class="flex justify-between items-end mb-2">
-            <div><p class="text-[10px] font-black uppercase tracking-widest text-brand-teal">SkillfulMeans Participation Rate</p><p class="text-[10px] text-stone-500 italic mt-0.5">% of total workforce actively using the program. New programs typically start at 20–30%.</p></div>
-            <span class="text-brand-teal font-black text-xl ml-4" id="lbl-participation">25%</span>
-          </div>
-          <input type="range" id="inp-participation" min="5" max="80" step="1" value="25" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-2"><span>5% minimal</span><span>20–30% realistic</span><span>80% max</span></div>
-          <p class="text-[10px] text-stone-500 italic mt-2">Increase this slider to model program growth in Years 2 and 3.</p>
-        </div>
-
+        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">2</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Client Operational Metrics</h3></div>
         <div>
           <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Annual Voluntary Turnover Rate</p><p class="text-[10px] text-stone-400 italic">SHRM avg: ~18%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-turnover">18%</span></div>
           <input type="range" id="inp-turnover" min="5" max="60" step="1" value="18" class="w-full">
@@ -279,17 +267,52 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         </div>
       </div>
 
-      <!-- Card 3: Investment -->
+      <!-- Card 3: Engagement Stage Selector -->
       <div class="bg-plum rounded-[2.5rem] p-8 shadow-sm text-white space-y-5 relative overflow-hidden">
         <div class="circle-bg w-32 h-32 bg-white/5 -top-10 -right-10"></div>
-        <div class="flex items-center gap-3 relative z-10"><div class="w-8 h-8 bg-white text-plum rounded-full flex items-center justify-center text-xs font-black shrink-0">3</div><h3 class="font-black text-stone-100 text-sm uppercase tracking-widest">Annual Program Investment</h3></div>
-        <p class="text-sm text-stone-300 relative z-10">Fully or partially fundable through carrier wellness dollars — at zero net cost to your client.</p>
-        <div class="relative z-10">
-          <div class="flex justify-between items-end mb-3"><span class="text-[10px] font-black uppercase tracking-widest text-stone-300">Total Annual SkillfulMeans Investment</span><span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200">$<span id="lbl-investment">25,000</span></span></div>
-          <input type="range" id="inp-investment" min="5000" max="150000" step="5000" value="25000" class="w-full plum-track">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-2"><span>$5k</span><span>$150k</span></div>
+        <div class="flex items-center gap-3 relative z-10">
+          <div class="w-8 h-8 bg-white text-plum rounded-full flex items-center justify-center text-xs font-black shrink-0">3</div>
+          <h3 class="font-black text-stone-100 text-sm uppercase tracking-widest">Engagement Stage &amp; Investment</h3>
         </div>
-        <div class="bg-white/10 rounded-2xl p-4 text-sm text-stone-200 relative z-10"><strong>Tip:</strong> A 250-employee Cigna client typically has $25k–$40k in wellness dollars available. This program is often fully fundable.</div>
+        <p class="text-sm text-stone-300 relative z-10">Select the engagement level that fits your client. Investment is calculated automatically based on headcount. All stages are fundable through carrier wellness dollars.</p>
+
+        <!-- Stage slider -->
+        <div class="relative z-10">
+          <div class="flex justify-between items-end mb-3">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-stone-300 block">Engagement Stage (1–10)</span>
+              <span class="text-brand-teal font-black text-xl mt-1 block" id="lbl-stage-name">Stage 1 — The Spark</span>
+            </div>
+            <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">1,725</span></span>
+          </div>
+          <input type="range" id="inp-stage" min="1" max="10" step="1" value="1" class="w-full plum-track">
+          <div class="flex justify-between text-[10px] text-stone-400 mt-2">
+            <span>Stage 1<br>The Spark</span>
+            <span class="text-center">Stage 5<br>The Alignment</span>
+            <span class="text-right">Stage 10<br>The Ecosystem</span>
+          </div>
+        </div>
+
+        <!-- Stage detail card -->
+        <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase tracking-widest text-stone-300">Engagement Rate</span>
+            <span class="text-white font-black text-lg" id="lbl-engagement-pct">2%</span>
+          </div>
+          <p class="text-stone-300 text-xs italic" id="lbl-stage-intent">Low-barrier pilot to test team engagement.</p>
+          <div class="border-t border-white/10 pt-3">
+            <span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">Services Included</span>
+            <div id="lbl-services" class="space-y-1 text-xs text-stone-200"></div>
+          </div>
+          <div class="border-t border-white/10 pt-3">
+            <span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-1">Investment Breakdown</span>
+            <div id="lbl-cost-breakdown" class="space-y-0.5 text-xs text-stone-300"></div>
+          </div>
+        </div>
+
+        <div class="bg-white/10 rounded-2xl p-4 text-sm text-stone-200 relative z-10">
+          <strong>Wellness Dollar Tip:</strong> Cigna, BCBS, and United clients commonly leave $10k–$75k in wellness funds unspent annually. Most stages 1–5 can be fully funded at zero net cost.
+        </div>
       </div>
     </div>
 
@@ -322,13 +345,13 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         </div>
         <!-- EAP vs SM -->
         <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-6">
-          <h4 class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Program Reach vs. Your Current EAP</h4>
+          <h4 class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Program Engagement vs. Your Current EAP</h4>
           <div class="flex items-center gap-6">
             <div class="text-center"><span class="block text-3xl font-black text-rose-500"><span id="res-eap-pct">4</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">Current EAP</span></div>
             <div class="flex-1 text-center text-stone-300 font-black text-2xl">→</div>
-            <div class="text-center"><span class="block text-3xl font-black text-brand-teal"><span id="res-sm-participation">25</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">SkillfulMeans</span></div>
+            <div class="text-center"><span class="block text-3xl font-black text-brand-teal"><span id="res-sm-participation">2</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">SkillfulMeans Stage</span></div>
           </div>
-          <p class="text-[10px] text-stone-400 mt-3 italic">Adjust the participation slider above to model different scenarios.</p>
+          <p class="text-[10px] text-stone-400 mt-3 italic">Engagement rate is determined by the selected stage above. Higher stages drive deeper workforce engagement.</p>
         </div>
       </div>
 
@@ -504,73 +527,190 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 </div><!-- end main-wrapper -->
 
 <script>
-// ── CONFIG: Replace with your deployed Google Apps Script URL ─────
+// ── CONFIG ────────────────────────────────────────────────────────
 const API_URL = '/api/submit';
 
-// ── STATE ──────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────
 let isUnlocked = false, roiChart = null, calcData = {}, brokerInfo = {};
 
-// ── MODALS ─────────────────────────────────────────────────────────
+// ── STAGE DEFINITIONS ─────────────────────────────────────────────
+const STAGES = [
+  { num:1,  name:'The Spark',      engagement:0.02, workshops:1, challenges:0, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1, intent:'Low-barrier pilot to test team engagement.' },
+  { num:2,  name:'The Awareness',  engagement:0.05, workshops:2, challenges:0, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1, intent:'Establishing a shared language for mental health.' },
+  { num:3,  name:'The Practice',   engagement:0.10, workshops:2, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1, intent:'Moving from theory to 14 days of habit building.' },
+  { num:4,  name:'The Habit',      engagement:0.20, workshops:3, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2, intent:'Reinforcing resilience through consistent touchpoints.' },
+  { num:5,  name:'The Alignment',  engagement:0.50, workshops:3, challenges:1, leq:true,  groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2, intent:'Upskilling the core management team in growth mindset.' },
+  { num:6,  name:'The Shift',      engagement:0.60, workshops:4, challenges:2, leq:true,  groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2, intent:'Scaling culture change across multiple departments.' },
+  { num:7,  name:'The Mastery',    engagement:0.70, workshops:4, challenges:2, leq:true,  groupCoaching:true,  indivCoaching:false, consultant:false, incentiveStage:2, intent:'Utilizing the 16% leadership cohort for group integration.' },
+  { num:8,  name:'The Resilience', engagement:0.80, workshops:4, challenges:3, leq:true,  groupCoaching:true,  indivCoaching:false, consultant:false, incentiveStage:3, intent:'Full workforce coverage with targeted leadership support.' },
+  { num:9,  name:'The Core',       engagement:0.90, workshops:4, challenges:4, leq:true,  groupCoaching:true,  indivCoaching:true,  consultant:false, incentiveStage:3, intent:'Providing 1:1 support for high-impact leaders (5% of staff).' },
+  { num:10, name:'The Ecosystem',  engagement:1.00, workshops:4, challenges:4, leq:true,  groupCoaching:true,  indivCoaching:true,  consultant:true,  incentiveStage:3, intent:'A permanent culture where wellbeing is a strategic priority.' },
+];
+
+const BOX_COST = 75;
+
+function calcInvestment(stage, N) {
+  let total = 0;
+  const breakdown = [];
+
+  // Workshops
+  const wCost = stage.workshops * 1500;
+  total += wCost;
+  breakdown.push({ label: `${stage.workshops} Workshop${stage.workshops>1?'s':''}`, cost: wCost });
+
+  // Challenges
+  if (stage.challenges > 0) {
+    const cCost = stage.challenges * N * 30;
+    total += cCost;
+    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''}`, cost: cCost });
+  }
+
+  // LEQ Series
+  if (stage.leq) {
+    total += 10000;
+    breakdown.push({ label: 'Leadership EQ Series', cost: 10000 });
+  }
+
+  // Group Coaching
+  if (stage.groupCoaching) {
+    const cohorts = Math.ceil((N * 0.16) / 12);
+    const gcCost = cohorts * 5000;
+    total += gcCost;
+    breakdown.push({ label: `Group Coaching (${cohorts} cohort${cohorts>1?'s':''})`, cost: gcCost });
+  }
+
+  // Individual Coaching
+  if (stage.indivCoaching) {
+    const icCost = (N * 0.05) * 5000;
+    total += icCost;
+    breakdown.push({ label: `Individual Coaching (${Math.round(N*0.05)} leaders)`, cost: icCost });
+  }
+
+  // Wellness Consultant
+  if (stage.consultant) {
+    total += 10000;
+    breakdown.push({ label: 'Dedicated Wellness Consultant + Platform Access', cost: 10000 });
+  }
+
+  // Incentives (Wellness Boxes)
+  let boxes = 0;
+  if (stage.incentiveStage === 1) {
+    boxes = stage.challenges > 0 ? stage.challenges * 3 : stage.workshops * 3;
+  } else if (stage.incentiveStage === 2) {
+    boxes = (stage.challenges * 3) + (stage.workshops * 3);
+  } else {
+    boxes = N;
+  }
+  const boxCost = boxes * BOX_COST;
+  total += boxCost;
+  breakdown.push({ label: `Wellness Boxes (${boxes}${stage.incentiveStage===3?' — full workforce':''})`, cost: boxCost });
+
+  return { total, breakdown };
+}
+
+function updateStageDisplay(stage, N) {
+  const { total, breakdown } = calcInvestment(stage, N);
+
+  document.getElementById('lbl-stage-name').textContent = `Stage ${stage.num} — ${stage.name}`;
+  document.getElementById('lbl-investment').textContent = total.toLocaleString();
+  document.getElementById('lbl-engagement-pct').textContent = Math.round(stage.engagement * 100) + '%';
+  document.getElementById('lbl-stage-intent').textContent = stage.intent;
+  document.getElementById('res-sm-participation').textContent = Math.round(stage.engagement * 100);
+
+  // Services list
+  const servicesEl = document.getElementById('lbl-services');
+  const serviceItems = [];
+  if (stage.workshops)     serviceItems.push(`✓ ${stage.workshops} Workshop${stage.workshops>1?'s':''} ($1,500 each)`);
+  if (stage.challenges)    serviceItems.push(`✓ ${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''}`);
+  if (stage.leq)           serviceItems.push('✓ Leadership EQ Series (3-part)');
+  if (stage.groupCoaching) serviceItems.push('✓ Group Coaching (16% of workforce)');
+  if (stage.indivCoaching) serviceItems.push('✓ Individual Coaching (5% of leaders)');
+  if (stage.consultant)    serviceItems.push('✓ Dedicated Wellness Consultant + Platform Data');
+  const boxLabel = stage.incentiveStage === 3 ? 'Full Workforce' : stage.incentiveStage === 2 ? 'Per Challenge + Workshop' : 'Per Workshop';
+  serviceItems.push(`✓ Wellness Boxes — Stage ${stage.incentiveStage} (${boxLabel})`);
+  servicesEl.innerHTML = serviceItems.map(s => `<div>${s}</div>`).join('');
+
+  // Cost breakdown
+  const breakdownEl = document.getElementById('lbl-cost-breakdown');
+  breakdownEl.innerHTML = breakdown.map(b => `<div class="flex justify-between"><span>${b.label}</span><span class="font-bold ml-4">$${b.cost.toLocaleString()}</span></div>`).join('');
+
+  return { total, stage };
+}
+
+// ── MODALS ────────────────────────────────────────────────────────
 function openModal(id)  { const m=document.getElementById(id); if(m){m.style.display='block';document.body.style.overflow='hidden';} }
 function closeModal(id) { const m=document.getElementById(id); if(m){m.style.display='none';document.body.style.overflow='auto';} }
 
-// ── FORMAT ─────────────────────────────────────────────────────────
+// ── FORMAT ────────────────────────────────────────────────────────
 function fmt(n){ return Math.round(n).toLocaleString(); }
 
-// ── CALCULATE ──────────────────────────────────────────────────────
+// ── CALCULATE ─────────────────────────────────────────────────────
 function runCalculator(){
-  const employees    = Math.max(1,parseInt(document.getElementById('inp-employees').value)||250);
-  const avgSalary    = Math.max(1,parseInt(document.getElementById('inp-salary').value)||65000);
-  const healthPrem   = Math.max(1,parseInt(document.getElementById('inp-healthpremium').value)||15000);
-  const stressRate   = parseInt(document.getElementById('inp-stress').value)/100;
-  const participRate = parseInt(document.getElementById('inp-participation').value)/100;
-  const turnoverRate = parseInt(document.getElementById('inp-turnover').value)/100;
+  const employees    = Math.max(1, parseInt(document.getElementById('inp-employees').value) || 250);
+  const avgSalary    = Math.max(1, parseInt(document.getElementById('inp-salary').value) || 65000);
+  const healthPrem   = Math.max(1, parseInt(document.getElementById('inp-healthpremium').value) || 15000);
+  const stressRate   = parseInt(document.getElementById('inp-stress').value) / 100;
+  const turnoverRate = parseInt(document.getElementById('inp-turnover').value) / 100;
   const absDays      = parseFloat(document.getElementById('inp-absent').value);
   const eapPct       = parseInt(document.getElementById('inp-eap').value);
-  const investment   = parseInt(document.getElementById('inp-investment').value);
+  const stageIdx     = parseInt(document.getElementById('inp-stage').value) - 1;
 
-  document.getElementById('lbl-stress').textContent       = Math.round(stressRate*100)+'%';
-  document.getElementById('lbl-participation').textContent = Math.round(participRate*100)+'%';
-  document.getElementById('lbl-turnover').textContent     = Math.round(turnoverRate*100)+'%';
-  document.getElementById('lbl-absent').textContent       = absDays;
-  document.getElementById('lbl-eap').textContent          = eapPct+'%';
-  document.getElementById('lbl-investment').textContent   = investment.toLocaleString();
-  document.getElementById('res-eap-pct').textContent      = eapPct;
-  document.getElementById('res-sm-participation').textContent = Math.round(participRate*100);
+  const stage = STAGES[stageIdx];
+  const { total: investment } = updateStageDisplay(stage, employees);
+  const pf = stage.engagement; // engagement rate drives all ROI multipliers
 
-  const totalPayroll = employees*avgSalary;
-  const stressedEmp  = employees*stressRate;
-  const pf           = participRate; // participation factor (scales all benefits)
+  document.getElementById('lbl-stress').textContent   = Math.round(stressRate * 100) + '%';
+  document.getElementById('lbl-turnover').textContent = Math.round(turnoverRate * 100) + '%';
+  document.getElementById('lbl-absent').textContent   = absDays;
+  document.getElementById('lbl-eap').textContent      = eapPct + '%';
+  document.getElementById('res-eap-pct').textContent  = eapPct;
 
-  // Driver 1: Medical (Baicker 65% + MGH 35%), scaled by participation
-  const medBaicker = investment*3.27*pf;
-  const medMGH     = (stressedEmp*healthPrem*1.40)*0.43*Math.min(pf*0.5,0.12);
-  const medSavings = medBaicker*0.65 + medMGH*0.35;
+  const totalPayroll = employees * avgSalary;
+  const stressedEmp  = employees * stressRate;
 
-  // Driver 2: Absenteeism (Baicker 60% + Hassard 40%)
-  const absBaicker = investment*2.73*pf;
-  const absHassard = (employees*pf*absDays*(avgSalary/250))*0.40*0.28;
-  const absSavings = absBaicker*0.60 + absHassard*0.40;
+  // ── Driver 1: Medical Claims ───────────────────────────────────
+  // Baicker (2010) 65% + MGH MBSR 35%, scaled by engagement
+  const medBaicker = investment * 3.27 * pf;
+  const medMGH     = (stressedEmp * healthPrem * 1.40) * 0.43 * Math.min(pf * 0.5, 0.12);
+  // Goetzel (2016): $2,304 lower spend per engaged employee — additional validation layer
+  const medGoetzel = employees * pf * 2304 * 0.08; // conservative 8% capture of total benefit
+  const medSavings = (medBaicker * 0.55) + (medMGH * 0.30) + (medGoetzel * 0.15);
 
-  // Driver 3: Presenteeism (Kessler + Aetna MBSR 2015)
-  const pressSavings = stressedEmp*pf*avgSalary*0.075*0.15;
+  // ── Driver 2: Absenteeism ─────────────────────────────────────
+  // Baicker (2010) 60% + Hassard (2018) 40%
+  const absBaicker = investment * 2.73 * pf;
+  const absHassard = (employees * pf * absDays * (avgSalary / 250)) * 0.40 * 0.28;
+  const absSavings = absBaicker * 0.60 + absHassard * 0.40;
 
-  // Driver 4: Turnover (SHRM + Gallup)
-  const turnoverSavings = employees*turnoverRate*(avgSalary*0.75)*(0.20*pf*2);
+  // ── Driver 3: Presenteeism ────────────────────────────────────
+  // Kessler (2006) Harvard: 7.5% productivity loss + Aetna MBSR: 15% recovery
+  // WHO (2022): adds $4 ROI per $1 — used as validation weight
+  const pressKessler  = stressedEmp * pf * avgSalary * 0.075 * 0.15;
+  const pressWHO      = investment * 4.0 * pf * 0.05; // conservative WHO ROI validation (5% weight)
+  const pressSavings  = pressKessler * 0.90 + pressWHO * 0.10;
 
-  // Driver 5: Workers' Comp BH (NCCI + WorkCare)
-  const wcSavings = totalPayroll*0.015*0.25*0.50*(pf*2);
+  // ── Driver 4: Turnover ────────────────────────────────────────
+  // SHRM (2022) replacement 75% salary + Gallup/Harter engagement-retention
+  // Harter (2020): engaged teams 43% lower turnover — refined from 20% to pf-weighted
+  const retentionImprovement = Math.min(0.43, 0.43 * pf); // max 43% per Gallup meta-analysis
+  const turnoverSavings = employees * turnoverRate * (avgSalary * 0.75) * retentionImprovement;
 
-  const annualSavings = medSavings+absSavings+pressSavings+turnoverSavings+wcSavings;
-  const y1 = annualSavings*0.45, y2 = annualSavings*0.80, y3 = annualSavings*1.00;
-  const total3yr = y1+y2+y3;
-  const netROI   = ((total3yr - investment*3) / (investment*3))*100;
-  const paybackMo = Math.max(1,Math.round(investment/(annualSavings/12)));
+  // ── Driver 5: Workers' Comp BH ────────────────────────────────
+  // NCCI (2021): 1.5% payroll WC spend, 25% BH comorbidity, 50% cost reduction
+  const wcSavings = totalPayroll * 0.015 * 0.25 * 0.50 * (pf * 2);
 
-  calcData = {employees,avgSalary,healthPrem,stressRate,participRate,turnoverRate,absDays,eapPct,investment,medSavings,absSavings,pressSavings,turnoverSavings,wcSavings,annualSavings,y1,y2,y3,total3yr,netROI,paybackMo};
+  const annualSavings = medSavings + absSavings + pressSavings + turnoverSavings + wcSavings;
+  const y1 = annualSavings * 0.45;
+  const y2 = annualSavings * 0.80;
+  const y3 = annualSavings * 1.00;
+  const total3yr   = y1 + y2 + y3;
+  const netROI     = ((total3yr - investment * 3) / (investment * 3)) * 100;
+  const paybackMo  = Math.max(1, Math.round(investment / (annualSavings / 12)));
 
-  const maxCat = Math.max(medSavings,absSavings,pressSavings,turnoverSavings,wcSavings,1);
-  const bp = v => Math.round((v/maxCat)*100)+'%';
+  calcData = { employees, avgSalary, healthPrem, stressRate, participRate: pf, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
+
+  const maxCat = Math.max(medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, 1);
+  const bp = v => Math.round((v / maxCat) * 100) + '%';
 
   document.getElementById('res-total3yr').textContent  = fmt(total3yr);
   document.getElementById('res-roi').textContent       = Math.round(netROI);
@@ -590,13 +730,13 @@ function runCalculator(){
   document.getElementById('bar-turnover').style.width     = bp(turnoverSavings);
   document.getElementById('bar-wc').style.width           = bp(wcSavings);
 
-  if(roiChart){
-    const ramp=[0.45,0.80,1.00];
-    roiChart.data.datasets[0].data=ramp.map(r=>Math.round(medSavings*r));
-    roiChart.data.datasets[1].data=ramp.map(r=>Math.round(absSavings*r));
-    roiChart.data.datasets[2].data=ramp.map(r=>Math.round(pressSavings*r));
-    roiChart.data.datasets[3].data=ramp.map(r=>Math.round(turnoverSavings*r));
-    roiChart.data.datasets[4].data=ramp.map(r=>Math.round(wcSavings*r));
+  if (roiChart) {
+    const ramp = [0.45, 0.80, 1.00];
+    roiChart.data.datasets[0].data = ramp.map(r => Math.round(medSavings * r));
+    roiChart.data.datasets[1].data = ramp.map(r => Math.round(absSavings * r));
+    roiChart.data.datasets[2].data = ramp.map(r => Math.round(pressSavings * r));
+    roiChart.data.datasets[3].data = ramp.map(r => Math.round(turnoverSavings * r));
+    roiChart.data.datasets[4].data = ramp.map(r => Math.round(wcSavings * r));
     roiChart.update('none');
   }
 }
@@ -642,6 +782,8 @@ function submitData(pdfBase64){
     stressRate:Math.round(d.stressRate*100),participRate:Math.round(d.participRate*100),
     turnoverRate:Math.round(d.turnoverRate*100),absDays:d.absDays,
     eapPct:d.eapPct,investment:d.investment,
+    stageName: d.stage ? `Stage ${d.stage.num} — ${d.stage.name}` : '',
+    stageNum: d.stage ? d.stage.num : 1,
     medSavings:Math.round(d.medSavings),absSavings:Math.round(d.absSavings),
     pressSavings:Math.round(d.pressSavings),turnoverSavings:Math.round(d.turnoverSavings),
     wcSavings:Math.round(d.wcSavings),annualSavings:Math.round(d.annualSavings),
@@ -695,16 +837,40 @@ function buildPDFDoc(){
 
   doc.setTextColor(74,32,64);doc.setFontSize(20);doc.setFont('helvetica','bold');doc.text('Mental Fitness ROI Analysis',12,96);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-  doc.text(d.employees.toLocaleString()+' employees  ·  $'+d.avgSalary.toLocaleString()+' avg salary  ·  '+Math.round(d.participRate*100)+'% participation  ·  $'+d.investment.toLocaleString()+'/yr investment',12,104);
+  const stageLabel = d.stage ? `Stage ${d.stage.num} — ${d.stage.name}  ·  ${Math.round(d.stage.engagement*100)}% engagement` : '';
+  doc.text(d.employees.toLocaleString()+' employees  ·  $'+d.avgSalary.toLocaleString()+' avg salary  ·  $'+d.investment.toLocaleString()+'/yr investment',12,104);
+  if(stageLabel){doc.setTextColor(74,32,64);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(stageLabel,12,111);}
 
   const kpis=[{l:'3-YEAR IMPACT',v:'$'+fmt(d.total3yr),c:[15,118,110]},{l:'NET ROI',v:Math.round(d.netROI)+'%',c:[74,32,64]},{l:'PAYBACK',v:d.paybackMo+' months',c:[74,32,64]}];
-  kpis.forEach((k,i)=>{const x=12+i*64;doc.setFillColor(...k.c);doc.roundedRect(x,109,59,28,4,4,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(k.l,x+29.5,117,{align:'center'});doc.setFontSize(i===0?13:14);doc.text(k.v,x+29.5,128,{align:'center'});});
+  kpis.forEach((k,i)=>{const x=12+i*64;doc.setFillColor(...k.c);doc.roundedRect(x,116,59,28,4,4,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(k.l,x+29.5,124,{align:'center'});doc.setFontSize(i===0?13:14);doc.text(k.v,x+29.5,135,{align:'center'});});
 
-  doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,150);
-  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,160);
+  // Services included box
+  if(d.stage){
+    const svc=[];
+    if(d.stage.workshops) svc.push(`${d.stage.workshops} Workshop${d.stage.workshops>1?'s':''} ($1,500 each)`);
+    if(d.stage.challenges) svc.push(`${d.stage.challenges} 14-Day Challenge${d.stage.challenges>1?'s':''}`);
+    if(d.stage.leq) svc.push('Leadership EQ Series (3-part)');
+    if(d.stage.groupCoaching) svc.push('Group Coaching (16% of workforce)');
+    if(d.stage.indivCoaching) svc.push('Individual Coaching (5% of leaders)');
+    if(d.stage.consultant) svc.push('Dedicated Wellness Consultant + Platform Data Access');
+    const boxLabel = d.stage.incentiveStage===3?'Full Workforce Wellness Boxes':d.stage.incentiveStage===2?'Wellness Boxes (per challenge + workshop)':'Wellness Boxes (per workshop)';
+    svc.push(boxLabel);
+    const cols = Math.ceil(svc.length/2);
+    doc.setFillColor(245,240,248);doc.roundedRect(12,148,W-24,4+(cols*5)+4,3,3,'F');
+    doc.setTextColor(74,32,64);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('SERVICES INCLUDED',16,154);
+    let sx=0,sy=0;
+    svc.forEach((s,i)=>{
+      const col=Math.floor(i/cols); const row=i%cols;
+      doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+      doc.text('✓ '+s, 16+(col*(W-28)/2), 159+(row*5));
+    });
+  }
 
-  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR Program (2015)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking Report (2022) + Gallup State of Workplace (2023)'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
-  let yy=167;
+  doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,175);
+  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,183);
+
+  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR (2015) + WHO (2022)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking (2022) + Gallup (2023) + Harter et al. Meta-Analysis (2020)'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
+  let yy=190;
   drivers.forEach((dr,i)=>{doc.setFillColor(i%2===0?248:255,i%2===0?247:255,i%2===0?244:255);doc.rect(12,yy-4,W-24,14,'F');doc.setFillColor(74,32,64);doc.rect(12,yy-4,3,14,'F');doc.setTextColor(40,40,40);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.text(dr.n,19,yy+2);doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(dr.s,19,yy+7);doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.text('$'+fmt(dr.v),W-12,yy+3,{align:'right'});yy+=15;});
 
   doc.setFillColor(15,118,110);doc.rect(12,yy+2,W-24,20,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('3-YEAR PROJECTION (Ramp-up: Y1=45%, Y2=80%, Y3=100%)',20,yy+10);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('Year 1: $'+fmt(d.y1),20,yy+17);doc.text('Year 2: $'+fmt(d.y2),75,yy+17);doc.text('Year 3: $'+fmt(d.y3),130,yy+17);
@@ -828,7 +994,7 @@ function initApp(){
   Chart.defaults.font.family="'Inter',sans-serif";
   initWCChart(); initROIChart(); initScrollProgress();
   ['inp-employees','inp-salary','inp-healthpremium'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',runCalculator);el.addEventListener('change',runCalculator);}});
-  ['inp-stress','inp-participation','inp-turnover','inp-absent','inp-eap','inp-investment'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
+  ['inp-stress','inp-stage','inp-turnover','inp-absent','inp-eap'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
   runCalculator();
 }
 
