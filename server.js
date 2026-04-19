@@ -49,16 +49,10 @@ app.post('/api/submit', async (req, res) => {
     console.error('Sheets error:', err.message);
   }
 
-  // Email
+  // Email via SendGrid
   try {
-    const nodemailer = require('nodemailer');
-    console.log('nodemailer loaded:', typeof nodemailer.createTransport);
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: 465,
-      secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
+    const sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     const html = `<!DOCTYPE html><html><head><style>
       body{font-family:Arial,sans-serif;background:#fdfbf7;margin:0;color:#1c1917}
@@ -92,18 +86,20 @@ app.post('/api/submit', async (req, res) => {
       </div>
     </div></body></html>`;
 
-    await transporter.sendMail({
-      from: `"SkillfulMeans" <${process.env.SMTP_USER}>`,
+    // Send to broker
+    await sgMail.send({
       to: data.email,
+      from: { email: 'admin@skillfulmeans.life', name: 'SkillfulMeans' },
       subject: `Your SkillfulMeans ROI Analysis — ${data.company}`,
       html
     });
     console.log('Broker email: success');
 
+    // Send lead notification
     if (process.env.NOTIFY_EMAIL) {
-      await transporter.sendMail({
-        from: `"SkillfulMeans ROI" <${process.env.SMTP_USER}>`,
+      await sgMail.send({
         to: process.env.NOTIFY_EMAIL,
+        from: { email: 'admin@skillfulmeans.life', name: 'SkillfulMeans ROI' },
         subject: `New Lead: ${data.firstName} ${data.lastName} — ${data.company} ($${fmt(data.total3yr)})`,
         text: `New lead\n\nName: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nCompany: ${data.company}\nPhone: ${data.phone||'n/a'}\n\n3-Year Impact: $${fmt(data.total3yr)}\nROI: ${Math.round(data.netROI)}%\nPayback: ${data.paybackMonths} months\nAnnual Savings: $${fmt(data.annualSavings)}\n\nAdd to Notion CRM as Warmed up lead`
       });
@@ -111,6 +107,7 @@ app.post('/api/submit', async (req, res) => {
     }
   } catch(err) {
     console.error('Email error:', err.message);
+    if (err.response) console.error('SendGrid error details:', JSON.stringify(err.response.body));
   }
 
   res.json({ success: true });
