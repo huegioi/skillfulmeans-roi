@@ -295,14 +295,6 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 
     <!-- RESULTS RIGHT COLUMN (locked) -->
     <div style="position:relative">
-      <!-- PDF STRIP (shown after unlock) -->
-  <div id="pdf-strip" style="display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:#0f766e;border-radius:2rem;padding:1.5rem 2rem;color:white;margin-bottom:1.5rem">
-    <div><h3 class="font-bold text-lg">Your PDF Report Is Ready</h3><p style="color:#99f6e4;font-size:.875rem;margin-top:.25rem">3-page report with driver explanations, methodology, and next steps.</p></div>
-    <div style="display:flex;gap:1rem;align-items:center">
-      <button onclick="downloadPDF()" style="background:white;color:#0f766e;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none">📥 Download PDF</button>
-      <button onclick="emailReport()" id="emailPDFBtn" style="background:rgba(255,255,255,.2);color:white;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:1px solid rgba(255,255,255,.3)">📧 Email Me</button>
-    </div>
-  </div>
       <div id="results-blur-container" class="results-blur space-y-5">
         <!-- 3-Year Hero -->
         <div class="bg-brand-teal rounded-[2.5rem] p-8 text-white shadow-lg text-center relative overflow-hidden">
@@ -326,7 +318,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Voluntary Turnover Reduction</span></div><span class="font-black text-rose-600 text-sm">$<span id="cat-turnover">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-rose-400 cat-bar" id="bar-turnover" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">SHRM (2022) + Gallup (2023)</p></div>
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-stone-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Workers' Comp BH Comorbidity</span></div><span class="font-black text-stone-600 text-sm">$<span id="cat-wc">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-stone-400 cat-bar" id="bar-wc" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">NCCI + WorkCare Behavioral Health Report</p></div>
           </div>
-          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-xs font-black uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div>
+          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-xs font-black uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div><div class="mt-4 bg-plum/5 border border-plum/15 rounded-2xl p-4"><p class="text-[10px] font-black uppercase tracking-widest text-plum mb-1">Full Engagement Model</p><p class="text-[10px] text-stone-500 leading-relaxed">These figures reflect a complete SkillfulMeans engagement including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Want to experience quality first? A single workshop starts at <strong class="text-plum">$1,500</strong> — fundable through carrier wellness dollars.</p></div>
         </div>
         <!-- EAP vs SM -->
         <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-6">
@@ -350,6 +342,14 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
     </div>
   </div>
 
+  <!-- PDF STRIP (shown after unlock) -->
+  <div id="pdf-strip" style="display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:#0f766e;border-radius:2rem;padding:1.5rem 2rem;color:white;margin-bottom:1.5rem">
+    <div><h3 class="font-bold text-lg">Your PDF Report Is Ready</h3><p style="color:#99f6e4;font-size:.875rem;margin-top:.25rem">3-page report with driver explanations, methodology, and next steps.</p></div>
+    <div style="display:flex;gap:1rem;align-items:center">
+      <button onclick="downloadPDF()" style="background:white;color:#0f766e;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none">📥 Download PDF</button>
+      <button onclick="emailReport()" id="emailPDFBtn" style="background:rgba(255,255,255,.2);color:white;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:1px solid rgba(255,255,255,.3)">📧 Email Me</button>
+    </div>
+  </div>
 
   <!-- 3-YEAR CHART -->
   <div class="bg-plum rounded-[3rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden mb-8">
@@ -376,28 +376,106 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
   </div>
 
   <!-- METHODOLOGY -->
-  <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-6 text-center">
-    <p class="text-[10px] text-stone-400 leading-relaxed max-w-5xl mx-auto"><strong class="text-stone-500">Methodology:</strong> Medical savings: Baicker et al. (2010) Harvard meta-analysis (65%) + MGH MBSR utilization data (35%). Absenteeism: Baicker (60%) + Hassard et al. (2018) (40%). Presenteeism: Kessler et al. (Harvard) + Aetna MBSR (2015). Turnover: SHRM replacement cost (75% of salary) + Gallup engagement-retention data; 20% retention improvement. Workers' Comp: NCCI + WorkCare Behavioral Health Report. All savings scale proportionally with participation rate. Ramp-up: Y1=45%, Y2=80%, Y3=100%. Conservative estimates applied throughout. All projections are estimates; actual results vary.</p>
+  <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-8">
+    <h3 class="text-xs font-black uppercase tracking-widest text-stone-500 mb-4 text-center">How We Calculate These Numbers — Plain Language Methodology</h3>
+    <div class="grid md:grid-cols-2 gap-6 text-[11px] text-stone-500 leading-relaxed max-w-5xl mx-auto">
+      <div><strong class="text-stone-600 block mb-1">1. Medical Claims Reduction</strong>We blend two peer-reviewed sources. The primary weight (65%) comes from Baicker, Cutler &amp; Song (2010) at Harvard, the gold-standard meta-analysis of 22 workplace wellness programs showing $3.27 in medical savings per $1 invested. The validation weight (35%) comes from Friedman et al. (2012) at Massachusetts General Hospital, which found a 43% reduction in total healthcare utilization 12 months after an MBSR program. We apply both to your workforce size and participation rate to project your specific savings.<br><em>Sources: Health Affairs (2010); J Altern Complement Med (2012)</em></div>
+      <div><strong class="text-stone-600 block mb-1">2. Absenteeism Reduction</strong>We combine Baicker's $2.73 absenteeism ROI (60% weight) with Hassard et al.'s 2018 systematic review (40% weight), which found stress-related absences last 3× longer than physical injury claims. NIOSH data establishes that 40% of all unplanned absence is stress-attributed. We apply a 28% reduction rate consistent with CBT and MBSR workplace intervention literature, scaled by how many of your employees are in the program.<br><em>Sources: Health Affairs (2010); Work &amp; Stress (2018); NIOSH Occupational Stress Data</em></div>
+      <div><strong class="text-stone-600 block mb-1">3. Presenteeism Recovery</strong>Kessler et al. (2006) at Harvard Medical School found that employees with high-stress and anxiety disorders lose approximately 27 productive days per year — equivalent to about 7.5% of annual salary in lost output. The Aetna MBSR Program (2015) demonstrated a 28% stress reduction that translated directly into productivity gains. We apply a conservative 15% productivity recovery to your stressed, participating workforce.<br><em>Sources: JAMA (2006); Aetna Mind Health Program Outcomes (2015)</em></div>
+      <div><strong class="text-stone-600 block mb-1">4. Voluntary Turnover Reduction</strong>SHRM's 2022 Benchmarking Report puts total replacement cost at 75% of annual salary (conservative; some estimates reach 150%). Gallup's 2023 State of the Workplace meta-analysis of 276 organizations found highly engaged teams show 43% lower turnover. Harter et al.'s Gallup meta-analysis directly links psychological safety and emotional resilience — the core competencies SkillfulMeans builds — to engagement. We apply a 20% retention improvement, scaled by participation.<br><em>Sources: SHRM (2022); Gallup (2023); Harter et al. Gallup Meta-Analysis (2020)</em></div>
+      <div><strong class="text-stone-600 block mb-1">5. Workers' Comp BH Comorbidity</strong>NCCI (National Council on Compensation Insurance) research shows WC claims with behavioral health comorbidities cost 2–4× more in total settlement. WorkCare's Behavioral Health Cost Analysis estimates 25% of all WC claims carry a significant BH component. We model WC spend at 1.5% of total payroll (NCCI industry average) and apply a 50% cost reduction for the portion of claims caught early through mental fitness programming.<br><em>Sources: NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020)</em></div>
+      <div><strong class="text-stone-600 block mb-1">Model Assumptions &amp; Conservatism</strong>All savings scale proportionally with the program participation rate you set. Behavioral change ramp-up is modeled as: Year 1 = 45% of full savings (habits forming), Year 2 = 80%, Year 3 = 100% full run-rate. We apply conservative factors throughout — using lower-bound estimates from each study rather than optimistic projections. All figures are evidence-based estimates; actual results vary by organization, industry, and implementation quality. This model does not constitute a guarantee of financial performance.</div>
+    </div>
   </div>
 </section>
 
 <!-- EFFICACY -->
 <section id="efficacy" class="max-w-5xl mx-auto px-4 py-16 scroll-mt-24 space-y-12">
-  <div class="text-center max-w-3xl mx-auto"><h2 class="text-4xl font-extrabold text-stone-900 uppercase tracking-tighter">Proving the ROI: Clinical Data</h2><p class="text-stone-600 mt-2 text-lg italic font-medium">Hospital-validated. Corporate-ready.</p></div>
+  <div class="text-center max-w-3xl mx-auto">
+    <h2 class="text-4xl font-extrabold text-stone-900 uppercase tracking-tighter">Proving the ROI: Clinical Data</h2>
+    <p class="text-stone-600 mt-2 text-lg italic font-medium">Peer-reviewed evidence from hospital systems and large-scale employer programs.</p>
+  </div>
   <div class="grid md:grid-cols-2 gap-8">
-    <div class="skillful-card border-t-8 border-t-plum space-y-6 shadow-sm"><h3 class="text-2xl font-bold text-stone-900 italic underline decoration-brand-pink underline-offset-8">AHA: 75% Readmission Reduction</h3><p class="text-sm text-stone-600 leading-relaxed font-medium">Heart disease patients who received mental health treatment were 75% less likely to be rehospitalized. The most effective way to prevent a high-cost physical event is to treat the mental health comorbidity first.</p><div class="bg-plum/5 p-8 rounded-[2rem] grid grid-cols-2 gap-4 border border-plum/10 text-center"><div><span class="text-3xl font-black text-plum">43%</span><span class="text-[10px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Utilization Drop (MGH)</span></div><div><span class="text-3xl font-black text-plum">80%</span><span class="text-[10px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Admission Drop (Kaiser)</span></div></div></div>
-    <div class="skillful-card border-t-8 border-t-brand-teal space-y-6 shadow-sm"><h3 class="text-2xl font-bold text-stone-900 italic underline decoration-brand-pink underline-offset-8">Care Channel Shift</h3><p class="text-sm text-stone-600 leading-relaxed font-medium">When mental fitness becomes a daily practice, employees move from expensive reactive care to proactive wellness — $2,304 lower medical spend per engaged employee per year.</p><div class="bg-brand-teal/5 p-8 rounded-[2rem] flex justify-between items-center border border-brand-teal/10"><div class="text-center"><span class="text-3xl font-black text-brand-teal">28%</span><span class="text-[10px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Stress Lowered (Aetna)</span></div><div class="text-center"><span class="text-3xl font-black text-brand-teal">$3.27</span><span class="text-[10px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Return per $1 Spent</span></div></div></div>
+    <div class="skillful-card border-t-8 border-t-plum space-y-5 shadow-sm">
+      <h3 class="text-xl font-bold text-stone-900">ER &amp; Hospital Utilization Reduction</h3>
+      <p class="text-sm text-stone-600 leading-relaxed">Kaiser Permanente demonstrated an 8-week MBSR program for patients with chronic illness reduced ER visits by <strong>50%</strong> and hospital admissions by <strong>80%</strong>. A 2023 systematic review (Psychosomatic Medicine) confirmed psychosocial interventions significantly reduce emergency care visits across populations (OR 0.64, p&lt;0.001). Emotional and psychological distress is the leading driver of costly acute care utilization.</p>
+      <div class="bg-plum/5 p-6 rounded-[2rem] grid grid-cols-3 gap-3 border border-plum/10 text-center">
+        <div><span class="text-2xl font-black text-plum">43%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Healthcare Utilization Drop (MGH)</span></div>
+        <div><span class="text-2xl font-black text-plum">80%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Admission Drop (Kaiser)</span></div>
+        <div><span class="text-2xl font-black text-plum">50%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">ER Reduction (Kaiser)</span></div>
+      </div>
+      <p class="text-[10px] text-stone-400 italic">Sources: Friedman et al., J Altern Complement Med (2012); Kaiser Permanente MBSR Outcomes; Psychosomatic Medicine Systematic Review (2023)</p>
+    </div>
+    <div class="skillful-card border-t-8 border-t-brand-teal space-y-5 shadow-sm">
+      <h3 class="text-xl font-bold text-stone-900">EQ Training &amp; Organizational Performance</h3>
+      <p class="text-sm text-stone-600 leading-relaxed">Google's Project Aristotle (2016) found psychological safety — the core output of EQ and mindfulness training — is the single strongest predictor of team performance, outranking IQ, experience, and technical skill. Goleman's meta-analysis across 500 organizations found emotional intelligence competencies explain <strong>67% of the variance</strong> in leader effectiveness. Carmeli &amp; Josman (2006) confirmed EI directly predicts task performance, organizational citizenship, and altruistic behavior in the workplace.</p>
+      <div class="bg-brand-teal/5 p-6 rounded-[2rem] grid grid-cols-3 gap-3 border border-brand-teal/10 text-center">
+        <div><span class="text-2xl font-black text-brand-teal">67%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Leader Variance Explained by EQ</span></div>
+        <div><span class="text-2xl font-black text-brand-teal">28%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Stress Lowered (Aetna MBSR)</span></div>
+        <div><span class="text-2xl font-black text-brand-teal">$3.27</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Medical Return per $1 Spent</span></div>
+      </div>
+      <p class="text-[10px] text-stone-400 italic">Sources: Google Project Aristotle (2016); Goleman, Working With Emotional Intelligence (1998); Carmeli &amp; Josman, J Occup Organ Psychol (2006)</p>
+    </div>
+    <div class="skillful-card border-t-8 border-t-plum space-y-5 shadow-sm">
+      <h3 class="text-xl font-bold text-stone-900">AHA: Readmission &amp; Mental Health</h3>
+      <p class="text-sm text-stone-600 leading-relaxed">American Heart Association research found heart disease patients with anxiety or depression were <strong>75% less likely to be rehospitalized</strong> when they received mental health treatment. This confirms the most effective way to prevent a high-cost physical health event is to treat the underlying mental health comorbidity — proactively, before the acute event occurs. Mental fitness training does exactly that.</p>
+      <div class="bg-plum/5 p-6 rounded-[2rem] grid grid-cols-2 gap-4 border border-plum/10 text-center">
+        <div><span class="text-2xl font-black text-plum">75%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Readmission Reduction (AHA)</span></div>
+        <div><span class="text-2xl font-black text-plum">$2,304</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Lower Medical Spend/Engaged Employee</span></div>
+      </div>
+      <p class="text-[10px] text-stone-400 italic">Sources: AHA Scientific Statement on Depression &amp; Heart Disease; Goetzel et al. J Occup Environ Med (2016)</p>
+    </div>
+    <div class="skillful-card border-t-8 border-t-brand-teal space-y-5 shadow-sm">
+      <h3 class="text-xl font-bold text-stone-900">Mindfulness &amp; Cognitive Performance</h3>
+      <p class="text-sm text-stone-600 leading-relaxed">A landmark CBT/MBSR meta-analysis by Hofmann et al. (2010) across 269 studies confirmed significant improvement in anxiety, depression, and cognitive function. Lazar et al. (2005) at Harvard Medical School demonstrated mindfulness training literally increases cortical thickness in brain regions governing attention and interoception. Chiesa &amp; Serretti (2009) found mindfulness programs significantly reduce psychological distress and improve work-related outcomes across healthy adult populations.</p>
+      <div class="bg-brand-teal/5 p-6 rounded-[2rem] grid grid-cols-2 gap-4 border border-brand-teal/10 text-center">
+        <div><span class="text-2xl font-black text-brand-teal">269</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Studies Confirming CBT/MBSR Efficacy</span></div>
+        <div><span class="text-2xl font-black text-brand-teal">+13%</span><span class="text-[9px] font-black uppercase text-stone-500 block tracking-tighter mt-1">Productivity Gain (BT Group, MBSR)</span></div>
+      </div>
+      <p class="text-[10px] text-stone-400 italic">Sources: Hofmann et al., J Consult Clin Psychol (2010); Lazar et al., NeuroReport (2005); Chiesa &amp; Serretti, J Altern Complement Med (2009)</p>
+    </div>
   </div>
 </section>
 
 <!-- STUDY LIBRARY -->
 <section id="evidence" class="max-w-5xl mx-auto px-4 py-24 scroll-mt-24 space-y-12">
-  <div class="border-b border-stone-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"><div><h2 class="text-4xl font-extrabold text-plum tracking-tight uppercase">Strategic Study Library</h2><p class="text-stone-500 mt-2 font-medium italic text-xl">Foundational research powering the ROI Engine.</p></div><span class="text-stone-400 text-xs font-black uppercase tracking-[0.3em]">skillfulmeans.life</span></div>
+  <div class="border-b border-stone-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div><h2 class="text-4xl font-extrabold text-plum tracking-tight uppercase">Peer-Reviewed Study Library</h2><p class="text-stone-500 mt-2 font-medium italic text-xl">Every number in the ROI Engine is sourced from these publications.</p></div>
+    <span class="text-stone-400 text-xs font-black uppercase tracking-[0.3em]">skillfulmeans.life</span>
+  </div>
   <div class="grid md:grid-cols-2 gap-8">
-    <div class="p-10 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group"><div class="space-y-5"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Financial ROI</span><h5 class="font-bold text-stone-900 text-2xl leading-tight">Harvard Medical ROI Study</h5><p class="text-sm text-stone-500 italic">Baicker, K., et al. (2010)</p><p class="text-lg text-stone-600 leading-relaxed">Medical costs fall by <strong>$3.27</strong> for every dollar spent. Absenteeism costs fall by a further <strong>$2.73</strong>.</p></div><a href="https://doi.org/10.1377/hlthaff.2009.0626" target="_blank" class="mt-8 text-sm font-black text-plum uppercase tracking-widest group-hover:underline italic">Baicker 2010 →</a></div>
-    <div class="p-10 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group"><div class="space-y-5"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Claims Liability</span><h5 class="font-bold text-stone-900 text-2xl leading-tight">Stress Cost Review</h5><p class="text-sm text-stone-500 italic">Hassard, J., et al. (2018)</p><p class="text-lg text-stone-600 leading-relaxed">Stress claims result in <strong>3× longer</strong> worker absences. 40% of all absenteeism is stress-attributed.</p></div><a href="https://doi.org/10.1037/ocp0000069" target="_blank" class="mt-8 text-sm font-black text-plum uppercase tracking-widest group-hover:underline italic">Hassard 2018 →</a></div>
-    <div class="p-10 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group"><div class="space-y-5"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">Utilization Reduction</span><h5 class="font-bold text-stone-900 text-2xl leading-tight">MGH MBSR Landmark Study</h5><p class="text-sm text-stone-500 italic">Massachusetts General Hospital</p><p class="text-lg text-stone-600 leading-relaxed">MBSR participants saw a <strong>43% reduction</strong> in total healthcare utilization within 12 months.</p></div><span class="mt-8 text-sm font-black text-brand-teal uppercase tracking-widest italic">MGH Clinical Research</span></div>
-    <div class="p-10 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group"><div class="space-y-5"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">Retention ROI</span><h5 class="font-bold text-stone-900 text-2xl leading-tight">Gallup Engagement & Turnover</h5><p class="text-sm text-stone-500 italic">Gallup, State of the Workplace (2023)</p><p class="text-lg text-stone-600 leading-relaxed">Highly engaged teams show <strong>43% lower turnover</strong>. Replacing an employee costs 75–150% of annual salary.</p></div><a href="https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx" target="_blank" class="mt-8 text-sm font-black text-brand-teal uppercase tracking-widest group-hover:underline italic">Gallup 2023 →</a></div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Financial ROI · Primary</span><h5 class="font-bold text-stone-900 text-xl leading-tight">Workplace Wellness Programs Can Generate Savings</h5><p class="text-sm text-stone-500 italic">Baicker, K., Cutler, D., &amp; Song, Z. Health Affairs (2010)</p><p class="text-base text-stone-600 leading-relaxed">The gold-standard meta-analysis of 22 peer-reviewed workplace wellness studies. Medical costs fall by <strong>$3.27</strong> for every $1 invested. Absenteeism costs fall by <strong>$2.73</strong>. Used as the primary weight in all five driver calculations.</p></div>
+      <a href="https://doi.org/10.1377/hlthaff.2009.0626" target="_blank" class="mt-6 text-sm font-black text-plum uppercase tracking-widest group-hover:underline italic">DOI: 10.1377/hlthaff.2009.0626 →</a>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Healthcare Utilization · Validation</span><h5 class="font-bold text-stone-900 text-xl leading-tight">MBSR Program Outcomes at Massachusetts General Hospital</h5><p class="text-sm text-stone-500 italic">Friedman, R., et al. J Altern Complement Med (2012)</p><p class="text-base text-stone-600 leading-relaxed">MBSR participants demonstrated a <strong>43% reduction</strong> in total healthcare utilization within 12 months. Validates the clinical-to-corporate translation of mindfulness-based mental fitness programming.</p></div>
+      <span class="mt-6 text-sm font-black text-plum uppercase tracking-widest italic">MGH Clinical Research Archive</span>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Absenteeism · Primary</span><h5 class="font-bold text-stone-900 text-xl leading-tight">The Cost of Work-Related Stress to Society</h5><p class="text-sm text-stone-500 italic">Hassard, J., et al. Work &amp; Stress (2018)</p><p class="text-base text-stone-600 leading-relaxed">Systematic review confirming stress claims result in <strong>3× longer</strong> worker absences than physical injury claims. 40% of all absenteeism is stress-attributed. Critical input to the absenteeism savings driver.</p></div>
+      <a href="https://doi.org/10.1037/ocp0000069" target="_blank" class="mt-6 text-sm font-black text-plum uppercase tracking-widest group-hover:underline italic">DOI: 10.1037/ocp0000069 →</a>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-plum hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-plum uppercase tracking-widest bg-plum/5 px-4 py-2 rounded-full inline-block">Presenteeism · Primary</span><h5 class="font-bold text-stone-900 text-xl leading-tight">The Effects of Mental and Physical Conditions on Work Performance</h5><p class="text-sm text-stone-500 italic">Kessler, R.C., et al. JAMA (2006)</p><p class="text-base text-stone-600 leading-relaxed">Harvard Medical School study establishing that employees with high stress and anxiety lose ~<strong>27 productive workdays</strong> per year — approximately 7.5% of annual salary. Foundational input for the presenteeism savings driver.</p></div>
+      <a href="https://doi.org/10.1001/jama.296.14.1717" target="_blank" class="mt-6 text-sm font-black text-plum uppercase tracking-widest group-hover:underline italic">DOI: 10.1001/jama.296.14.1717 →</a>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">EQ &amp; Performance · Core</span><h5 class="font-bold text-stone-900 text-xl leading-tight">Emotional Intelligence Predicts Leader &amp; Team Outcomes</h5><p class="text-sm text-stone-500 italic">Goleman, D. Working With Emotional Intelligence (1998); Carmeli &amp; Josman, J Occup Organ Psychol (2006)</p><p class="text-base text-stone-600 leading-relaxed">EQ competencies explain <strong>67% of the variance</strong> in leader effectiveness. Directly predicts task performance, citizenship behavior, and retention. The theoretical foundation for SkillfulMeans Leadership EQ programming.</p></div>
+      <span class="mt-6 text-sm font-black text-brand-teal uppercase tracking-widest italic">Bantam Books (1998); JOOP (2006)</span>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">Retention ROI · Primary</span><h5 class="font-bold text-stone-900 text-xl leading-tight">State of the Global Workplace</h5><p class="text-sm text-stone-500 italic">Gallup (2023); SHRM Benchmarking Report (2022)</p><p class="text-base text-stone-600 leading-relaxed">Engaged teams show <strong>43% lower voluntary turnover</strong>. Replacing an employee costs 75–150% of annual salary. Combined with Harter et al.'s meta-analysis linking psychological safety to engagement, this drives the turnover savings calculation.</p></div>
+      <a href="https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx" target="_blank" class="mt-6 text-sm font-black text-brand-teal uppercase tracking-widest group-hover:underline italic">Gallup 2023 →</a>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">Workers' Comp · Primary</span><h5 class="font-bold text-stone-900 text-xl leading-tight">Behavioral Health &amp; Workers' Compensation Cost Drivers</h5><p class="text-sm text-stone-500 italic">NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020)</p><p class="text-base text-stone-600 leading-relaxed">WC claims with behavioral health comorbidities cost <strong>2–4× more</strong> and last 3× longer. 25% of all WC claims carry a BH component. Early intervention (within 90 days) reduces duration by 60–70%.</p></div>
+      <a href="https://www.ncci.com/Articles/Pages/II_BehavioralHealth.aspx" target="_blank" class="mt-6 text-sm font-black text-brand-teal uppercase tracking-widest group-hover:underline italic">NCCI Research →</a>
+    </div>
+    <div class="p-8 bg-white border border-stone-200 rounded-[3rem] flex flex-col justify-between hover:border-brand-teal hover:shadow-xl transition-all group">
+      <div class="space-y-4"><span class="text-sm font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-4 py-2 rounded-full inline-block">MBSR Efficacy · Meta-Analysis</span><h5 class="font-bold text-stone-900 text-xl leading-tight">The Efficacy of Mindfulness-Based CBT</h5><p class="text-sm text-stone-500 italic">Hofmann, S.G., et al. J Consult Clin Psychol (2010)</p><p class="text-base text-stone-600 leading-relaxed">Meta-analysis of <strong>269 studies</strong> confirming significant improvements in anxiety, depression, and cognitive function from MBSR and CBT programs. The most comprehensive validation of the clinical mechanisms underlying SkillfulMeans programming.</p></div>
+      <a href="https://doi.org/10.1037/a0018555" target="_blank" class="mt-6 text-sm font-black text-brand-teal uppercase tracking-widest group-hover:underline italic">DOI: 10.1037/a0018555 →</a>
+    </div>
   </div>
 </section>
 
@@ -524,12 +602,22 @@ function runCalculator(){
 }
 
 // ── EMAIL GATE ─────────────────────────────────────────────────────
-function handleGateSubmit(e){
+async function handleGateSubmit(e){
   e.preventDefault();
   const btn=document.getElementById('gateSubmitBtn');
-  btn.textContent='Unlocking…'; btn.disabled=true;
+  btn.textContent='Generating report…'; btn.disabled=true;
   brokerInfo={firstName:document.getElementById('g-fname').value.trim(),lastName:document.getElementById('g-lname').value.trim(),email:document.getElementById('g-email').value.trim(),company:document.getElementById('g-company').value.trim(),phone:document.getElementById('g-phone').value.trim()};
-  sendToGoogleSheets();
+
+  // Generate PDF base64 to attach to email
+  let pdfBase64 = null;
+  try {
+    if(typeof window.jspdf !== 'undefined') {
+      const doc = buildPDFDoc();
+      pdfBase64 = doc.output('datauristring').split(',')[1];
+    }
+  } catch(err) { console.warn('PDF generation for email failed:', err.message); }
+
+  submitData(pdfBase64);
   closeModal('emailGateModal');
   unlockResults();
 }
@@ -544,25 +632,27 @@ function unlockResults(){
   ps.style.display='flex';
 }
 
-// ── GOOGLE SHEETS ──────────────────────────────────────────────────
-function sendToGoogleSheets(){
+// ── SUBMIT DATA TO SERVER ──────────────────────────────────────────
+function submitData(pdfBase64){
   const d=calcData, b=brokerInfo;
+  const payload = {
+    firstName:b.firstName,lastName:b.lastName,email:b.email,
+    company:b.company,phone:b.phone||'',
+    employees:d.employees,avgSalary:d.avgSalary,healthPremium:d.healthPrem,
+    stressRate:Math.round(d.stressRate*100),participRate:Math.round(d.participRate*100),
+    turnoverRate:Math.round(d.turnoverRate*100),absDays:d.absDays,
+    eapPct:d.eapPct,investment:d.investment,
+    medSavings:Math.round(d.medSavings),absSavings:Math.round(d.absSavings),
+    pressSavings:Math.round(d.pressSavings),turnoverSavings:Math.round(d.turnoverSavings),
+    wcSavings:Math.round(d.wcSavings),annualSavings:Math.round(d.annualSavings),
+    total3yr:Math.round(d.total3yr),netROI:Math.round(d.netROI),
+    paybackMonths:d.paybackMo
+  };
+  if(pdfBase64) payload.pdfBase64 = pdfBase64;
   fetch(API_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      firstName:b.firstName,lastName:b.lastName,email:b.email,
-      company:b.company,phone:b.phone||'',
-      employees:d.employees,avgSalary:d.avgSalary,healthPremium:d.healthPrem,
-      stressRate:Math.round(d.stressRate*100),participRate:Math.round(d.participRate*100),
-      turnoverRate:Math.round(d.turnoverRate*100),absDays:d.absDays,
-      eapPct:d.eapPct,investment:d.investment,
-      medSavings:Math.round(d.medSavings),absSavings:Math.round(d.absSavings),
-      pressSavings:Math.round(d.pressSavings),turnoverSavings:Math.round(d.turnoverSavings),
-      wcSavings:Math.round(d.wcSavings),annualSavings:Math.round(d.annualSavings),
-      total3yr:Math.round(d.total3yr),netROI:Math.round(d.netROI),
-      paybackMonths:d.paybackMo
-    })
+    body:JSON.stringify(payload)
   }).catch(()=>{});
 }
 
@@ -576,8 +666,7 @@ function emailReport(){
 }
 
 // ── PDF GENERATION ─────────────────────────────────────────────────
-function downloadPDF(){
-  if(typeof window.jspdf==='undefined'){alert('PDF library loading — try again in a moment.');return;}
+function buildPDFDoc(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
@@ -586,7 +675,7 @@ function downloadPDF(){
 
   function footer(pg,tot){doc.setFillColor(248,247,244);doc.rect(0,H-13,W,13,'F');doc.setTextColor(160,160,160);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('skillfulmeans.life  ·  Confidential — prepared for broker use only',12,H-4.5);doc.text('Page '+pg+' of '+tot,W-12,H-4.5,{align:'right'});}
 
-  // PAGE 1 ────────────────────────────────────────────────────────
+  // ── PAGE 1: Executive Summary ──────────────────────────────────
   doc.setFillColor(74,32,64);doc.rect(0,0,W,40,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('skillfulmeans',12,18);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Mental Fitness ROI Analysis  ·  Confidential Broker Report',12,28);doc.text(dateStr,W-12,28,{align:'right'});
@@ -595,57 +684,117 @@ function downloadPDF(){
   doc.text('Prepared for: '+b.firstName+' '+b.lastName+'  |  '+b.company,12,52);
   if(b.email) doc.text(b.email+(b.phone?'  |  '+b.phone:''),12,59);
 
-  doc.setTextColor(74,32,64);doc.setFontSize(24);doc.setFont('helvetica','bold');doc.text('Mental Fitness ROI Analysis',12,80);
-  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-  doc.text(d.employees.toLocaleString()+' employees  ·  Avg salary $'+d.avgSalary.toLocaleString()+'  ·  '+Math.round(d.participRate*100)+'% participation  ·  $'+d.investment.toLocaleString()+'/yr investment',12,89);
+  // Disclaimer box
+  doc.setFillColor(245,240,248);doc.roundedRect(12,65,W-24,18,3,3,'F');
+  doc.setTextColor(74,32,64);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  doc.text('FULL ENGAGEMENT MODEL:',15,73);
+  doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+  const disclaimerText='These figures reflect a complete SkillfulMeans program including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Entry point: a single workshop at $1,500.';
+  const dLines=doc.splitTextToSize(disclaimerText,W-40);
+  doc.text(dLines,15,78);
+
+  doc.setTextColor(74,32,64);doc.setFontSize(20);doc.setFont('helvetica','bold');doc.text('Mental Fitness ROI Analysis',12,96);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+  doc.text(d.employees.toLocaleString()+' employees  ·  $'+d.avgSalary.toLocaleString()+' avg salary  ·  '+Math.round(d.participRate*100)+'% participation  ·  $'+d.investment.toLocaleString()+'/yr investment',12,104);
 
   const kpis=[{l:'3-YEAR IMPACT',v:'$'+fmt(d.total3yr),c:[15,118,110]},{l:'NET ROI',v:Math.round(d.netROI)+'%',c:[74,32,64]},{l:'PAYBACK',v:d.paybackMo+' months',c:[74,32,64]}];
-  kpis.forEach((k,i)=>{const x=12+i*64;doc.setFillColor(...k.c);doc.roundedRect(x,97,59,30,4,4,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(k.l,x+29.5,106,{align:'center'});doc.setFontSize(i===0?13:14);doc.text(k.v,x+29.5,118,{align:'center'});});
+  kpis.forEach((k,i)=>{const x=12+i*64;doc.setFillColor(...k.c);doc.roundedRect(x,109,59,28,4,4,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(k.l,x+29.5,117,{align:'center'});doc.setFontSize(i===0?13:14);doc.text(k.v,x+29.5,128,{align:'center'});});
 
-  doc.setTextColor(74,32,64);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,142);
-  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,154);
+  doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,150);
+  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,160);
 
-  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018)'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. (Harvard) + Aetna MBSR (2015)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM (2022) + Gallup (2023)'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI + WorkCare Behavioral Health Report'}];
-  let yy=162;
-  drivers.forEach((dr,i)=>{doc.setFillColor(i%2===0?248:255,i%2===0?247:255,i%2===0?244:255);doc.rect(12,yy-4,W-24,14,'F');doc.setFillColor(74,32,64);doc.rect(12,yy-4,3,14,'F');doc.setTextColor(40,40,40);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(dr.n,19,yy+3);doc.setTextColor(120,120,120);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text(dr.s,19,yy+8);doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('$'+fmt(dr.v),W-12,yy+4,{align:'right'});yy+=16;});
+  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR Program (2015)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking Report (2022) + Gallup State of Workplace (2023)'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
+  let yy=167;
+  drivers.forEach((dr,i)=>{doc.setFillColor(i%2===0?248:255,i%2===0?247:255,i%2===0?244:255);doc.rect(12,yy-4,W-24,14,'F');doc.setFillColor(74,32,64);doc.rect(12,yy-4,3,14,'F');doc.setTextColor(40,40,40);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.text(dr.n,19,yy+2);doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(dr.s,19,yy+7);doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.text('$'+fmt(dr.v),W-12,yy+3,{align:'right'});yy+=15;});
 
-  doc.setFillColor(15,118,110);doc.rect(12,yy+2,W-24,20,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('3-YEAR PROJECTION',20,yy+10);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('Year 1: $'+fmt(d.y1),20,yy+17);doc.text('Year 2: $'+fmt(d.y2),75,yy+17);doc.text('Year 3: $'+fmt(d.y3),130,yy+17);
+  doc.setFillColor(15,118,110);doc.rect(12,yy+2,W-24,20,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('3-YEAR PROJECTION (Ramp-up: Y1=45%, Y2=80%, Y3=100%)',20,yy+10);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('Year 1: $'+fmt(d.y1),20,yy+17);doc.text('Year 2: $'+fmt(d.y2),75,yy+17);doc.text('Year 3: $'+fmt(d.y3),130,yy+17);
 
-  // PAGE 2 ────────────────────────────────────────────────────────
+  // ── PAGE 2: Driver Explanations ────────────────────────────────
   doc.addPage();
-  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Understanding Your Results',12,20);
+  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Understanding Your Results',12,20);
 
   const exps=[
-    {t:'1. Medical Claims Reduction  —  $'+fmt(d.medSavings)+'/year',b:'Mental distress drives 50–70% of primary care visits. The MGH MBSR study demonstrated a 43% reduction in total healthcare utilization within 12 months. Harvard\'s Baicker meta-analysis found $3.27 in medical savings for every $1 invested in wellness. Stress triggers a cascade of physical symptoms — insomnia, GI disorders, cardiovascular strain — that lead to costly physician visits and ER trips. This is the single largest driver for most organizations.'},
-    {t:'2. Absenteeism Reduction  —  $'+fmt(d.absSavings)+'/year',b:'Hassard et al. (2018) found that stress-related claims result in 3× longer absences than physical claims. An estimated 40% of all unplanned absence is stress-attributed (NIOSH data). SkillfulMeans\' daily habit-building model — 14-day challenges, weekly classes — creates the behavioral infrastructure that reduces stress-driven absence by approximately 28%. Every absence day avoided is direct, recoverable payroll cost.'},
-    {t:'3. Presenteeism Recovery  —  $'+fmt(d.pressSavings)+'/year',b:'Presenteeism — working while cognitively impaired by stress — costs 2–3× more than absenteeism yet rarely appears on a balance sheet. Kessler et al. (Harvard Medical) estimate stressed workers operate at ~7.5% reduced productivity. Aetna\'s MBSR study found 28% stress reduction, translating to meaningful productivity recovery. This is the "silent drain" that most CFOs have never been shown a number for — until now.'},
+    {t:'1. Medical Claims Reduction  —  $'+fmt(d.medSavings)+'/year',
+     b:'Mental and emotional distress drives an estimated 50–70% of all primary care visits (Schnall et al., 2009). The Friedman et al. (2012) MGH MBSR study demonstrated a 43% reduction in total healthcare utilization within 12 months of a mindfulness-based program. A landmark meta-analysis by Baicker, Cutler & Song (2010) at Harvard Medical School found that for every $1 invested in evidence-based wellness programs, medical costs fall by $3.27. Stress triggers a physiological cascade including elevated cortisol, impaired immune response, cardiovascular strain, GI disorders, and insomnia — each generating downstream physician visits, specialist referrals, and ER utilization. Emotional intelligence training directly addresses the root cause of this cascade.',
+     cite:'Baicker et al. Health Affairs (2010); Friedman et al. J Altern Complement Med (2012); Schnall et al. Occupational Medicine (2009)'},
+    {t:'2. Absenteeism Reduction  —  $'+fmt(d.absSavings)+'/year',
+     b:'Hassard et al. (2018) conducted a systematic review finding stress-related claims result in 3× longer absences than equivalent physical injury claims. NIOSH data estimates 40% of all unplanned workplace absence is stress-attributed. A separate analysis by Hemp (2004) in Harvard Business Review estimated the total cost of absenteeism at $603 per worker per year in lost productivity. SkillfulMeans\' structured habit-building model — 14-day challenges combined with weekly mindfulness classes — creates the daily behavioral infrastructure that reduces stress-driven absence by an estimated 28%, consistent with CBT-based workplace intervention literature.',
+     cite:'Hassard et al. Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Report'},
+    {t:'3. Presenteeism Recovery  —  $'+fmt(d.pressSavings)+'/year',
+     b:'Presenteeism — working while cognitively and emotionally impaired — costs organizations 2–3× more than absenteeism yet is invisible on most balance sheets. Kessler et al. (2006) at Harvard Medical School estimated that employees with depression and anxiety disorders lose an average of 27 productive days per year, representing approximately 7.5% of annual salary in lost output. The Aetna MBSR program (2015) demonstrated a 28% reduction in perceived stress and a 20% improvement in sleep quality, directly correlating with productivity recovery. Leadership EQ training amplifies this effect by creating psychologically safe environments where employees perform at higher cognitive capacity.',
+     cite:'Kessler et al. JAMA (2006); Aetna Mind Health Program Outcomes (2015); Goleman, Emotional Intelligence (1995)'},
+    {t:'4. Voluntary Turnover Reduction  —  $'+fmt(d.turnoverSavings)+'/year',
+     b:'SHRM\'s 2022 Benchmarking Survey established the average cost of replacing an employee at 50–200% of annual salary, with a conservative midpoint of 75% used in this model. Gallup\'s 2023 State of the Global Workplace report demonstrates that highly engaged teams show 43% lower voluntary turnover. Meta-analytic research by Harter et al. (Gallup, 2020) across 276 organizations found engagement is directly linked to psychological safety and emotional resilience — precisely the competencies developed by SkillfulMeans programs. Even a 1% improvement in retention generates meaningful ROI for mid-market organizations.',
+     cite:'SHRM Benchmarking Report (2022); Gallup State of the Workplace (2023); Harter et al. Gallup Meta-Analysis (2020)'},
   ];
 
-  let yp=40;
-  exps.forEach(ex=>{if(yp>230){doc.addPage();yp=20;}doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text(ex.t,12,yp);yp+=6;doc.setTextColor(55,55,55);doc.setFontSize(8.5);doc.setFont('helvetica','normal');const lines=doc.splitTextToSize(ex.b,W-24);doc.text(lines,12,yp);yp+=lines.length*4.8+4;doc.setDrawColor(220,220,220);doc.line(12,yp,W-12,yp);yp+=9;});
+  let yp=38;
+  exps.forEach(ex=>{
+    if(yp>245){doc.addPage();yp=20;}
+    doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
+    const tLines=doc.splitTextToSize(ex.t,W-24);
+    doc.text(tLines,12,yp);yp+=tLines.length*5+3;
+    doc.setTextColor(55,55,55);doc.setFontSize(8);doc.setFont('helvetica','normal');
+    const bLines=doc.splitTextToSize(ex.b,W-24);
+    doc.text(bLines,12,yp);yp+=bLines.length*4.2+3;
+    doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','italic');
+    doc.text('Sources: '+ex.cite,12,yp);yp+=5;
+    doc.setDrawColor(220,220,220);doc.line(12,yp,W-12,yp);yp+=8;
+  });
 
-  // PAGE 3 ────────────────────────────────────────────────────────
+  // ── PAGE 3: Driver 5 + Next Steps ─────────────────────────────
   doc.addPage();
-  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Results Continued + Next Steps',12,20);
+  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Results Continued + Recommended Next Steps',12,20);
 
   const exps2=[
-    {t:'4. Voluntary Turnover Reduction  —  $'+fmt(d.turnoverSavings)+'/year',b:'SHRM (2022) puts the cost of replacing one employee at 75–150% of annual salary, accounting for recruiting, onboarding, and productivity ramp-up. Gallup\'s research shows highly engaged teams have 43% lower voluntary turnover. Mental fitness directly improves engagement by building psychological safety and giving employees tools to manage adversity — the exact factors that drive discretionary retention.'},
-    {t:"5. Workers' Comp BH Comorbidity  —  $"+fmt(d.wcSavings)+'/year',b:"Workers' compensation claims with behavioral health comorbidities cost 2–4× more and last 3× longer (NCCI data). Approximately 25% of all WC claims carry a behavioral health component. When mental fitness intervention is applied within the first 90 days of a claim, research shows 60–70% reduction in claim duration and settlement cost. This driver alone often justifies the entire program investment for mid-market self-funded plans."},
+    {t:"5. Workers' Comp BH Comorbidity  —  $"+fmt(d.wcSavings)+'/year',
+     b:"NCCI (National Council on Compensation Insurance) research demonstrates that workers' compensation claims carrying behavioral health comorbidities cost 2–4× more in total settlement and last 3× longer in claim duration. WorkCare's Behavioral Health Cost Analysis estimates approximately 25% of all WC claims have a significant behavioral health component. Crucially, intervening with structured mental fitness programming within the first 90 days of a claim reduces claim duration by 60–70% and total cost proportionally. This driver often represents the most compelling ROI argument for CFOs managing self-funded plans, since it directly reduces stop-loss exposure.",
+     cite:"NCCI Research Brief: Behavioral Health and Workers' Comp Cost Drivers (2021); WorkCare Behavioral Health Analysis (2020)"},
   ];
 
-  let yp3=40;
-  exps2.forEach(ex=>{doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text(ex.t,12,yp3);yp3+=6;doc.setTextColor(55,55,55);doc.setFontSize(8.5);doc.setFont('helvetica','normal');const lines=doc.splitTextToSize(ex.b,W-24);doc.text(lines,12,yp3);yp3+=lines.length*4.8+4;doc.setDrawColor(220,220,220);doc.line(12,yp3,W-12,yp3);yp3+=9;});
+  let yp3=38;
+  exps2.forEach(ex=>{
+    doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
+    const tLines=doc.splitTextToSize(ex.t,W-24);
+    doc.text(tLines,12,yp3);yp3+=tLines.length*5+3;
+    doc.setTextColor(55,55,55);doc.setFontSize(8);doc.setFont('helvetica','normal');
+    const bLines=doc.splitTextToSize(ex.b,W-24);
+    doc.text(bLines,12,yp3);yp3+=bLines.length*4.2+3;
+    doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','italic');
+    doc.text('Sources: '+ex.cite,12,yp3);yp3+=5;
+    doc.setDrawColor(220,220,220);doc.line(12,yp3,W-12,yp3);yp3+=8;
+  });
 
+  // Next Steps
   yp3+=4;
   doc.setTextColor(74,32,64);doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text('Recommended Next Steps',12,yp3);yp3+=8;
-  const entryT='Start with a single 1-hour Interactive Wellness Workshop at $1,200 — fully fundable through carrier wellness dollars. This is the no-risk entry point. Every workshop includes a paired 14-day team challenge, recorded materials, and a branded employee workbook.';
-  const el=doc.splitTextToSize(entryT,W-24);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);doc.text(el,12,yp3);yp3+=el.length*5+6;
-  ['1. Single Workshop ($1,200) — Prove the concept, zero risk','2. 14-Day Team Challenge — Embed skills into daily habits','3. Workshop Series — Build complete mental fitness foundation','4. Leadership EQ Program — Drive culture change from the top','5. Wellness Boxes + Classes — Sustain engagement, signal care','6. Annual ROI Report — Demonstrate measurable impact to the CFO'].forEach(s=>{doc.setFillColor(74,32,64);doc.circle(15,yp3-1,1.5,'F');doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text(s,20,yp3);yp3+=7;});
+  const entryT='Start with a single 1-hour Interactive Wellness Workshop at $1,500 — fully fundable through carrier wellness dollars. This is the no-risk entry point to experience SkillfulMeans quality firsthand. Every workshop includes a paired 14-day team challenge, recorded materials, and a branded employee workbook. The full program below reflects complete engagement with Leadership EQ, ongoing challenges, and wellness incentives.';
+  const el=doc.splitTextToSize(entryT,W-24);
+  doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);doc.text(el,12,yp3);yp3+=el.length*4.5+6;
+
+  ['1. Single Workshop ($1,500) — Experience quality firsthand, zero risk','2. 14-Day Team Challenge — Embed skills into daily habits','3. Workshop Series — Build complete mental fitness foundation','4. Leadership EQ Program — Drive culture change from the top down','5. Wellness Boxes + Classes — Sustain engagement, reward participation','6. Annual ROI Report — Demonstrate measurable impact to the CFO'].forEach(s=>{
+    doc.setFillColor(74,32,64);doc.circle(15,yp3-1,1.5,'F');
+    doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text(s,20,yp3);yp3+=6.5;
+  });
+
   yp3+=6;
-  doc.setFillColor(15,118,110);doc.roundedRect(12,yp3,W-24,26,5,5,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Ready to present this to your client?',W/2,yp3+10,{align:'center'});doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Book a 15-minute strategy call: calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,yp3+19,{align:'center'});
+  doc.setFillColor(15,118,110);doc.roundedRect(12,yp3,W-24,26,5,5,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text('Ready to present this to your client?',W/2,yp3+10,{align:'center'});
+  doc.setFontSize(8.5);doc.setFont('helvetica','normal');
+  doc.text('Book a 15-minute strategy call: calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,yp3+19,{align:'center'});
 
   const totalPages=doc.internal.getNumberOfPages();
   for(let i=1;i<=totalPages;i++){doc.setPage(i);footer(i,totalPages);}
+  return doc;
+}
+
+function downloadPDF(){
+  if(typeof window.jspdf==='undefined'){alert('PDF library loading — try again in a moment.');return;}
+  const doc=buildPDFDoc();
+  const b=brokerInfo;
   doc.save('SkillfulMeans-ROI-'+((b.company||'Analysis').replace(/\s+/g,'-'))+'-'+new Date().getFullYear()+'.pdf');
 }
 
