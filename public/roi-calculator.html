@@ -250,7 +250,16 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 
       <!-- Card 2: Operational Metrics -->
       <div class="bg-white rounded-[2.5rem] border border-stone-200 p-8 shadow-sm space-y-6">
-        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">2</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Client Operational Metrics</h3></div>
+        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">2</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Program &amp; Operational Metrics</h3></div>
+        <div class="bg-brand-teal/5 border border-brand-teal/20 rounded-2xl p-5">
+          <div class="flex justify-between items-end mb-2">
+            <div><p class="text-[10px] font-black uppercase tracking-widest text-brand-teal">Employee Participation Rate</p><p class="text-[10px] text-stone-500 italic mt-0.5">% of total workforce who will attend the program. New programs typically see 20-30%.</p></div>
+            <span class="text-brand-teal font-black text-xl ml-4" id="lbl-participation">25%</span>
+          </div>
+          <input type="range" id="inp-participation" min="5" max="80" step="1" value="25" class="w-full">
+          <div class="flex justify-between text-[10px] text-stone-400 mt-2"><span>5% minimal</span><span>20-30% realistic</span><span>80% max</span></div>
+          <p class="text-[10px] text-stone-500 italic mt-2">ROI scales with both participation rate and stage effectiveness combined.</p>
+        </div>
         <div>
           <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Annual Voluntary Turnover Rate</p><p class="text-[10px] text-stone-400 italic">SHRM avg: ~18%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-turnover">18%</span></div>
           <input type="range" id="inp-turnover" min="5" max="60" step="1" value="18" class="w-full">
@@ -273,7 +282,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="circle-bg w-32 h-32 bg-white/5 -top-10 -right-10"></div>
         <div class="flex items-center gap-3 relative z-10">
           <div class="w-8 h-8 bg-white text-plum rounded-full flex items-center justify-center text-xs font-black shrink-0">3</div>
-          <h3 class="font-black text-stone-100 text-sm uppercase tracking-widest">Engagement Stage &amp; Investment</h3>
+          <h3 class="font-black text-stone-100 text-sm uppercase tracking-widest">Program Stage &amp; Investment</h3>
         </div>
         <p class="text-sm text-stone-300 relative z-10">Select the engagement level that fits your client. Investment is calculated automatically based on headcount. All stages are fundable through carrier wellness dollars.</p>
 
@@ -281,7 +290,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="relative z-10">
           <div class="flex justify-between items-end mb-3">
             <div>
-              <span class="text-[10px] font-black uppercase tracking-widest text-stone-300 block">Engagement Stage (1–10)</span>
+              <span class="text-[10px] font-black uppercase tracking-widest text-stone-300 block">Program Stage (1–10)</span>
               <span class="text-brand-teal font-black text-xl mt-1 block" id="lbl-stage-name">Stage 1 — The Spark</span>
             </div>
             <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">1,725</span></span>
@@ -297,7 +306,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <!-- Stage detail card -->
         <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase tracking-widest text-stone-300">Engagement Rate</span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-stone-300">Program Effectiveness</span>
             <span class="text-white font-black text-lg" id="lbl-engagement-pct">2%</span>
           </div>
           <p class="text-stone-300 text-xs italic" id="lbl-stage-intent">Low-barrier pilot to test team engagement.</p>
@@ -350,9 +359,9 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
           <div class="flex items-center gap-6">
             <div class="text-center"><span class="block text-3xl font-black text-rose-500"><span id="res-eap-pct">4</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">Current EAP</span></div>
             <div class="flex-1 text-center text-stone-300 font-black text-2xl">→</div>
-            <div class="text-center"><span class="block text-3xl font-black text-brand-teal"><span id="res-sm-participation">2</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">SkillfulMeans Stage</span></div>
+            <div class="text-center"><span class="block text-3xl font-black text-brand-teal"><span id="res-sm-participation">2</span>%</span><span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 block mt-1">SM Participation</span></div>
           </div>
-          <p class="text-[10px] text-stone-400 mt-3 italic">Engagement rate is determined by the selected stage above. Higher stages drive deeper workforce engagement.</p>
+          <p class="text-[10px] text-stone-400 mt-3 italic">Shows your set participation rate vs. current EAP utilization. ROI combines this with stage effectiveness.</p>
         </div>
       </div>
 
@@ -790,17 +799,21 @@ function runCalculator(){
   const turnoverRate = parseInt(document.getElementById('inp-turnover').value) / 100;
   const absDays      = parseFloat(document.getElementById('inp-absent').value);
   const eapPct       = parseInt(document.getElementById('inp-eap').value);
+  const participRate = parseInt(document.getElementById('inp-participation').value) / 100;
   const stageIdx     = parseInt(document.getElementById('inp-stage').value) - 1;
 
   const stage = STAGES[stageIdx];
   const { total: investment } = updateStageDisplay(stage, employees);
-  const pf = stage.engagement; // engagement rate drives all ROI multipliers
+  // pf = participation rate × stage effectiveness (both must be high for full ROI)
+  const pf = participRate * stage.engagement;
 
-  document.getElementById('lbl-stress').textContent   = Math.round(stressRate * 100) + '%';
-  document.getElementById('lbl-turnover').textContent = Math.round(turnoverRate * 100) + '%';
-  document.getElementById('lbl-absent').textContent   = absDays;
-  document.getElementById('lbl-eap').textContent      = eapPct + '%';
-  document.getElementById('res-eap-pct').textContent  = eapPct;
+  document.getElementById('lbl-stress').textContent       = Math.round(stressRate * 100) + '%';
+  document.getElementById('lbl-participation').textContent = Math.round(participRate * 100) + '%';
+  document.getElementById('lbl-turnover').textContent     = Math.round(turnoverRate * 100) + '%';
+  document.getElementById('lbl-absent').textContent       = absDays;
+  document.getElementById('lbl-eap').textContent          = eapPct + '%';
+  document.getElementById('res-eap-pct').textContent      = eapPct;
+  document.getElementById('res-sm-participation').textContent = Math.round(participRate * 100);
 
   const totalPayroll = employees * avgSalary;
   const stressedEmp  = employees * stressRate;
@@ -888,7 +901,7 @@ function runCalculator(){
   const netROI     = ((total3yr - investment * 3) / (investment * 3)) * 100;
   const paybackMo  = Math.max(1, Math.round(investment / (annualSavings / 12)));
 
-  calcData = { employees, avgSalary, healthPrem, stressRate, participRate: pf, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
+  calcData = { employees, avgSalary, healthPrem, stressRate, participRate, stageEffectiveness: stage.engagement, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
 
   const maxCat = Math.max(medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, 1);
   const bp = v => Math.round((v / maxCat) * 100) + '%';
@@ -1175,7 +1188,7 @@ function initApp(){
   Chart.defaults.font.family="'Inter',sans-serif";
   initWCChart(); initROIChart(); initScrollProgress();
   ['inp-employees','inp-salary','inp-healthpremium'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',runCalculator);el.addEventListener('change',runCalculator);}});
-  ['inp-stress','inp-stage','inp-turnover','inp-absent','inp-eap'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
+  ['inp-stress','inp-participation','inp-stage','inp-turnover','inp-absent','inp-eap'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
   runCalculator();
 }
 
