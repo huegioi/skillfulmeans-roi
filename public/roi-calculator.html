@@ -1009,147 +1009,423 @@ function emailReport(){
 function buildPDFDoc(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
-  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
+  const W=doc.internal.pageSize.getWidth();
+  const H=doc.internal.pageSize.getHeight();
   const d=calcData, b=brokerInfo;
+  const M=12; // left/right margin
+  const CW=W-M*2; // content width
   const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
-  function footer(pg,tot){doc.setFillColor(248,247,244);doc.rect(0,H-13,W,13,'F');doc.setTextColor(160,160,160);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('skillfulmeans.life  ·  Confidential — prepared for broker use only',12,H-4.5);doc.text('Page '+pg+' of '+tot,W-12,H-4.5,{align:'right'});}
-
-  // ── PAGE 1: Executive Summary ──────────────────────────────────
-  doc.setFillColor(74,32,64);doc.rect(0,0,W,40,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('skillfulmeans',12,18);
-  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Mental Fitness ROI Analysis  ·  Confidential Broker Report',12,28);doc.text(dateStr,W-12,28,{align:'right'});
-
-  doc.setTextColor(80,80,80);doc.setFontSize(10);doc.setFont('helvetica','normal');
-  doc.text('Prepared for: '+b.firstName+' '+b.lastName+'  |  '+b.company,12,52);
-  if(b.email) doc.text(b.email+(b.phone?'  |  '+b.phone:''),12,59);
-
-  // Disclaimer box
-  doc.setFillColor(245,240,248);doc.roundedRect(12,65,W-24,18,3,3,'F');
-  doc.setTextColor(74,32,64);doc.setFontSize(8);doc.setFont('helvetica','bold');
-  doc.text('FULL ENGAGEMENT MODEL:',15,73);
-  doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
-  const disclaimerText='These figures reflect a complete SkillfulMeans program including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Entry point: a single workshop at $1,500.';
-  const dLines=doc.splitTextToSize(disclaimerText,W-40);
-  doc.text(dLines,15,78);
-
-  doc.setTextColor(74,32,64);doc.setFontSize(20);doc.setFont('helvetica','bold');doc.text('Mental Fitness ROI Analysis',12,96);
-  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-  const stageLabel = d.stage ? `Stage ${d.stage.num} — ${d.stage.name}  ·  ${Math.round(d.stage.engagement*100)}% engagement` : '';
-  doc.text(d.employees.toLocaleString()+' employees  ·  $'+d.avgSalary.toLocaleString()+' avg salary  ·  $'+d.investment.toLocaleString()+'/yr investment',12,104);
-  if(stageLabel){doc.setTextColor(74,32,64);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(stageLabel,12,111);}
-
-  const kpis=[{l:'3-YEAR IMPACT',v:'$'+fmt(d.total3yr),c:[15,118,110]},{l:'NET ROI',v:Math.round(d.netROI)+'%',c:[74,32,64]},{l:'PAYBACK',v:d.paybackMo+' months',c:[74,32,64]}];
-  kpis.forEach((k,i)=>{const x=12+i*64;doc.setFillColor(...k.c);doc.roundedRect(x,116,59,28,4,4,'F');doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(k.l,x+29.5,124,{align:'center'});doc.setFontSize(i===0?13:14);doc.text(k.v,x+29.5,135,{align:'center'});});
-
-  // Services included box
-  if(d.stage){
-    const svc=[];
-    if(d.stage.workshops) svc.push(`${d.stage.workshops} Workshop${d.stage.workshops>1?'s':''} ($1,500 each)`);
-    if(d.stage.challenges) svc.push(`${d.stage.challenges} 14-Day Challenge${d.stage.challenges>1?'s':''}`);
-    if(d.stage.leq) svc.push('Leadership EQ Series (3-part)');
-    if(d.stage.groupCoaching) svc.push('Group Coaching (16% of workforce)');
-    if(d.stage.indivCoaching) svc.push('Individual Coaching (5% of leaders)');
-    if(d.stage.consultant) svc.push('Dedicated Wellness Consultant + Platform Data Access');
-    const boxLabel = d.stage.incentiveStage===3?'Full Workforce Wellness Boxes':d.stage.incentiveStage===2?'Wellness Boxes (per challenge + workshop)':'Wellness Boxes (per workshop)';
-    svc.push(boxLabel);
-    const cols = Math.ceil(svc.length/2);
-    doc.setFillColor(245,240,248);doc.roundedRect(12,148,W-24,4+(cols*5)+4,3,3,'F');
-    doc.setTextColor(74,32,64);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text('SERVICES INCLUDED',16,154);
-    let sx=0,sy=0;
-    svc.forEach((s,i)=>{
-      const col=Math.floor(i/cols); const row=i%cols;
-      doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
-      doc.text('✓ '+s, 16+(col*(W-28)/2), 159+(row*5));
-    });
+  // ── HELPERS ─────────────────────────────────────────────────────
+  function footer(pg,tot){
+    doc.setFillColor(245,243,240);
+    doc.rect(0,H-12,W,12,'F');
+    doc.setDrawColor(220,215,210);
+    doc.line(0,H-12,W,H-12);
+    doc.setTextColor(170,160,155);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica','normal');
+    doc.text('skillfulmeans.life  |  Confidential — prepared for broker use only',M,H-4);
+    doc.text('Page '+pg+' of '+tot,W-M,H-4,{align:'right'});
   }
 
-  doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,175);
-  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,183);
+  function pageHeader(title, subtitle){
+    // Plum gradient bar
+    doc.setFillColor(74,32,64);
+    doc.rect(0,0,W,36,'F');
+    // Teal accent strip
+    doc.setFillColor(15,118,110);
+    doc.rect(0,34,W,3,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(14);
+    doc.setFont('helvetica','bold');
+    doc.text(title,M,16);
+    if(subtitle){
+      doc.setFontSize(8);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(220,200,220);
+      doc.text(subtitle,M,26);
+    }
+    return 46; // return y position after header
+  }
 
-  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR (2015) + WHO (2022)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM (2022) + Gallup (2023) + Harter et al. (2020) · 12% max improvement — conservative program-level estimate'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
-  let yy=190;
-  drivers.forEach((dr,i)=>{doc.setFillColor(i%2===0?248:255,i%2===0?247:255,i%2===0?244:255);doc.rect(12,yy-4,W-24,14,'F');doc.setFillColor(74,32,64);doc.rect(12,yy-4,3,14,'F');doc.setTextColor(40,40,40);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.text(dr.n,19,yy+2);doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(dr.s,19,yy+7);doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.text('$'+fmt(dr.v),W-12,yy+3,{align:'right'});yy+=15;});
+  function sectionLabel(text, y){
+    doc.setTextColor(74,32,64);
+    doc.setFontSize(7);
+    doc.setFont('helvetica','bold');
+    doc.text(text.toUpperCase(),M,y);
+    doc.setDrawColor(74,32,64);
+    doc.setLineWidth(0.3);
+    doc.line(M+doc.getTextWidth(text.toUpperCase())+3, y-0.5, W-M, y-0.5);
+    doc.setLineWidth(0.2);
+    return y+6;
+  }
 
-  doc.setFillColor(15,118,110);doc.rect(12,yy+2,W-24,20,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('3-YEAR PROJECTION (Ramp-up: Y1=45%, Y2=80%, Y3=100%)',20,yy+10);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text('Year 1: $'+fmt(d.y1),20,yy+17);doc.text('Year 2: $'+fmt(d.y2),75,yy+17);doc.text('Year 3: $'+fmt(d.y3),130,yy+17);
+  function kpiBox(x, y, w, h, label, value, bgColor){
+    doc.setFillColor(...bgColor);
+    doc.roundedRect(x,y,w,h,3,3,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica','bold');
+    doc.text(label,x+w/2,y+7,{align:'center'});
+    doc.setFontSize(bgColor[0]===15?14:13);
+    doc.setFont('helvetica','bold');
+    doc.text(value,x+w/2,y+h-7,{align:'center'});
+  }
 
-  // ── PAGE 2: Driver Explanations ────────────────────────────────
+  function driverRow(name, value, source, y, shade){
+    const rh=16;
+    doc.setFillColor(shade?249:255, shade?247:255, shade?244:255);
+    doc.rect(M,y,CW,rh,'F');
+    doc.setFillColor(74,32,64);
+    doc.rect(M,y,3,rh,'F');
+    // Name
+    doc.setTextColor(30,30,30);
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica','bold');
+    doc.text(name,M+6,y+6);
+    // Source
+    doc.setTextColor(140,130,125);
+    doc.setFontSize(6);
+    doc.setFont('helvetica','normal');
+    const srcLines=doc.splitTextToSize(source, CW-50);
+    doc.text(srcLines,M+6,y+11);
+    // Value
+    doc.setTextColor(74,32,64);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','bold');
+    doc.text('$'+fmt(value),W-M,y+7,{align:'right'});
+    return y+rh+1;
+  }
+
+  function textBlock(title, body, cite, y, maxY){
+    // Check if we need a new page
+    const bodyLines=doc.splitTextToSize(body,CW);
+    const citeLines=doc.splitTextToSize('Sources: '+cite,CW);
+    const needed = 8 + bodyLines.length*4.5 + citeLines.length*4 + 12;
+    if(y+needed > maxY){
+      doc.addPage();
+      y=pageHeader('Understanding Your Results (continued)','');
+    }
+    // Title
+    doc.setTextColor(74,32,64);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    const tLines=doc.splitTextToSize(title,CW);
+    doc.text(tLines,M,y);
+    y+=tLines.length*5+3;
+    // Body
+    doc.setTextColor(50,48,46);
+    doc.setFontSize(7.8);
+    doc.setFont('helvetica','normal');
+    doc.setLineHeightFactor(1.4);
+    doc.text(bodyLines,M,y);
+    y+=bodyLines.length*4.5+3;
+    // Citation
+    doc.setTextColor(150,140,135);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica','italic');
+    doc.text(citeLines,M,y);
+    y+=citeLines.length*4+4;
+    // Divider
+    doc.setDrawColor(225,220,215);
+    doc.setLineWidth(0.25);
+    doc.line(M,y,W-M,y);
+    y+=8;
+    return y;
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // PAGE 1 — Executive Summary
+  // ════════════════════════════════════════════════════════════════
+  // Header
+  doc.setFillColor(74,32,64);
+  doc.rect(0,0,W,36,'F');
+  doc.setFillColor(15,118,110);
+  doc.rect(0,34,W,3,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.text('skillfulmeans',M,16);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(210,190,210);
+  doc.text('Mental Fitness ROI Analysis  |  Confidential Broker Report  |  '+dateStr,M,26);
+
+  // Broker info
+  let y=48;
+  doc.setTextColor(80,75,72);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('Prepared for:',M,y);
+  doc.setFont('helvetica','bold');
+  doc.setTextColor(30,25,22);
+  doc.text('  '+b.firstName+' '+b.lastName+'  |  '+b.company, M+doc.getTextWidth('Prepared for:'), y);
+  if(b.email){
+    y+=5.5;
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(100,95,92);
+    doc.setFontSize(8);
+    doc.text(b.email+(b.phone?' | '+b.phone:''),M,y);
+  }
+
+  // Thin separator
+  y+=6;
+  doc.setDrawColor(210,205,200);
+  doc.setLineWidth(0.3);
+  doc.line(M,y,W-M,y);
+  y+=8;
+
+  // Report title block
+  doc.setTextColor(74,32,64);
+  doc.setFontSize(18);
+  doc.setFont('helvetica','bold');
+  doc.text('Mental Fitness ROI Analysis',M,y);
+  y+=7;
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(100,95,92);
+  doc.text(d.employees.toLocaleString()+' employees  |  $'+d.avgSalary.toLocaleString()+' avg salary  |  $'+d.investment.toLocaleString()+' annual investment',M,y);
+  y+=5;
+  if(d.stage){
+    doc.setTextColor(15,118,110);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','bold');
+    doc.text('Stage '+d.stage.num+' — '+d.stage.name+'  |  '+Math.round(d.stage.engagement*100)+'% program effectiveness  |  '+Math.round(d.participRate*100)+'% participation',M,y);
+  }
+  y+=10;
+
+  // KPI boxes — 3 across
+  const kpiW=(CW-8)/3;
+  kpiBox(M,    y, kpiW, 24, '3-YEAR FINANCIAL IMPACT', '$'+fmt(d.total3yr), [15,118,110]);
+  kpiBox(M+kpiW+4, y, kpiW, 24, 'NET ROI', Math.round(d.netROI)+'%', [74,32,64]);
+  kpiBox(M+kpiW*2+8,y, kpiW, 24, 'PAYBACK PERIOD', d.paybackMo+' months', [74,32,64]);
+  y+=30;
+
+  // Full engagement disclaimer
+  doc.setFillColor(248,244,252);
+  doc.setDrawColor(200,185,210);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(M,y,CW,14,2,2,'FD');
+  doc.setFillColor(74,32,64);
+  doc.rect(M,y,3,14,'F');
+  doc.setTextColor(74,32,64);
+  doc.setFontSize(7);
+  doc.setFont('helvetica','bold');
+  doc.text('FULL ENGAGEMENT MODEL:',M+6,y+5.5);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(70,65,62);
+  const discText='These projections reflect a complete SkillfulMeans engagement. Entry point: a single workshop at $1,500 — fully fundable through carrier wellness dollars.';
+  const discLines=doc.splitTextToSize(discText,CW-40);
+  doc.text(discLines,M+6,y+10);
+  y+=20;
+
+  // Annual savings headline
+  doc.setTextColor(30,25,22);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','bold');
+  doc.text('Projected Annual Savings:',M,y);
+  doc.setTextColor(15,118,110);
+  doc.setFontSize(13);
+  doc.text('  $'+fmt(d.annualSavings), M+doc.getTextWidth('Projected Annual Savings:'), y-1);
+  y+=7;
+
+  // Drivers table
+  y=sectionLabel('Annual Savings by Driver (5-Driver Model  |  9 Peer-Reviewed Sources)',y);
+  const drivers=[
+    {n:'Medical Claims Reduction',   v:d.medSavings,    s:'Baicker et al. (2010); Friedman et al./MGH (2012); Goetzel et al. (2016); Unutzer et al./JAMA (2002)'},
+    {n:'Absenteeism Reduction',      v:d.absSavings,    s:'Baicker et al. (2010); Hassard et al. Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Data'},
+    {n:'Presenteeism Recovery',      v:d.pressSavings,  s:'Kessler et al. JAMA (2006); Aetna MBSR (2015); Loeppke et al. JOEM (2009); Wang et al. JOEM (2007); WHO (2022)'},
+    {n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking (2022); Gallup (2023); Harter et al. (2020); Lyubomirsky et al. Psych Bulletin (2005). Max 12% improvement applied.'},
+    {n:"Workers' Comp BH Comorbidity",v:d.wcSavings,   s:'NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)'},
+  ];
+  drivers.forEach((dr,i)=>{ y=driverRow(dr.n,dr.v,dr.s,y,i%2===0); });
+
+  y+=3;
+  // 3-year bar
+  doc.setFillColor(15,118,110);
+  doc.roundedRect(M,y,CW,20,3,3,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(7);
+  doc.setFont('helvetica','bold');
+  doc.text('3-YEAR PROJECTION  (Y1=45% ramp  |  Y2=80%  |  Y3=100% full rate)',M+4,y+7);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','bold');
+  const colW=CW/3;
+  doc.text('Year 1:  $'+fmt(d.y1), M+4, y+15);
+  doc.text('Year 2:  $'+fmt(d.y2), M+colW+4, y+15);
+  doc.text('Year 3:  $'+fmt(d.y3), M+colW*2+4, y+15);
+
+  // ════════════════════════════════════════════════════════════════
+  // PAGE 2 — Services Included + Driver Explanations 1–4
+  // ════════════════════════════════════════════════════════════════
   doc.addPage();
-  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Understanding Your Results',12,20);
+  y=pageHeader('Program Details & What Drives Your Results', 'Services included in the selected engagement stage, and the research behind each savings driver');
+
+  // Services included
+  if(d.stage){
+    y=sectionLabel('Services Included in Stage '+d.stage.num+' — '+d.stage.name, y);
+    const svc=[];
+    if(d.stage.workshops) svc.push(d.stage.workshops+' Workshop'+(d.stage.workshops>1?'s':'')+' @ $1,500 each');
+    if(d.stage.challenges) svc.push(d.stage.challenges+' 14-Day Team Challenge'+(d.stage.challenges>1?'s':''));
+    if(d.stage.leq) svc.push('Leadership EQ Series (3-part program + 360 assessment)');
+    if(d.stage.groupCoaching) svc.push('Group Coaching — '+Math.ceil(d.employees*0.16/12)+' cohorts of 12 (16% of workforce)');
+    if(d.stage.indivCoaching) svc.push('Individual Coaching — '+Math.round(d.employees*0.05)+' leaders (5% of staff)');
+    if(d.stage.consultant) svc.push('Dedicated Wellness Consultant + Platform Data Access');
+    const boxLabel=d.stage.incentiveStage===3?'Full Workforce Wellness Boxes ('+d.employees.toLocaleString()+" employees)":d.stage.incentiveStage===2?'Wellness Boxes — per challenge and workshop':'Wellness Boxes — per workshop';
+    svc.push(boxLabel);
+
+    const perCol=Math.ceil(svc.length/2);
+    const boxH=10+(perCol*6);
+    doc.setFillColor(240,248,245);
+    doc.setDrawColor(180,220,210);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M,y,CW,boxH,3,3,'FD');
+    doc.setFillColor(15,118,110);
+    doc.rect(M,y,3,boxH,'F');
+    svc.forEach((s,i)=>{
+      const col=Math.floor(i/perCol);
+      const row=i%perCol;
+      doc.setTextColor(20,80,60);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica','normal');
+      doc.text('- '+s, M+6+(col*(CW/2)), y+9+(row*6));
+    });
+    y+=boxH+10;
+
+    // Investment breakdown
+    y=sectionLabel('Investment Breakdown', y);
+    const {breakdown}=calcInvestment(d.stage,d.employees);
+    const brkH=8+(breakdown.length*5.5);
+    doc.setFillColor(252,250,248);
+    doc.roundedRect(M,y,CW,brkH,2,2,'F');
+    breakdown.forEach((item,i)=>{
+      doc.setTextColor(60,55,52);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica','normal');
+      doc.text(item.label,M+4,y+7+(i*5.5));
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(74,32,64);
+      doc.text('$'+item.cost.toLocaleString(),W-M-2,y+7+(i*5.5),{align:'right'});
+    });
+    // Total line
+    doc.setDrawColor(200,195,190);
+    doc.line(M,y+brkH-6,W-M,y+brkH-6);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(30,25,22);
+    doc.setFontSize(8.5);
+    doc.text('Total Annual Investment',M+4,y+brkH-1);
+    doc.setTextColor(15,118,110);
+    doc.text('$'+d.investment.toLocaleString(),W-M-2,y+brkH-1,{align:'right'});
+    y+=brkH+12;
+  }
+
+  // Driver explanations 1–4
+  y=sectionLabel('Understanding Your Results — Plain Language with Sources', y);
 
   const exps=[
-    {t:'1. Medical Claims Reduction  —  $'+fmt(d.medSavings)+'/year',
-     b:'Mental and emotional distress drives an estimated 50–70% of all primary care visits (Schnall et al., 2009). The Friedman et al. (2012) MGH MBSR study demonstrated a 43% reduction in total healthcare utilization within 12 months of a mindfulness-based program. A landmark meta-analysis by Baicker, Cutler & Song (2010) at Harvard Medical School found that for every $1 invested in evidence-based wellness programs, medical costs fall by $3.27. Stress triggers a physiological cascade including elevated cortisol, impaired immune response, cardiovascular strain, GI disorders, and insomnia — each generating downstream physician visits, specialist referrals, and ER utilization. Emotional intelligence training directly addresses the root cause of this cascade.',
-     cite:'Baicker et al. Health Affairs (2010); Friedman et al. J Altern Complement Med (2012); Schnall et al. Occupational Medicine (2009)'},
-    {t:'2. Absenteeism Reduction  —  $'+fmt(d.absSavings)+'/year',
-     b:'Hassard et al. (2018) conducted a systematic review finding stress-related claims result in 3× longer absences than equivalent physical injury claims. NIOSH data estimates 40% of all unplanned workplace absence is stress-attributed. A separate analysis by Hemp (2004) in Harvard Business Review estimated the total cost of absenteeism at $603 per worker per year in lost productivity. SkillfulMeans\' structured habit-building model — 14-day challenges combined with weekly mindfulness classes — creates the daily behavioral infrastructure that reduces stress-driven absence by an estimated 28%, consistent with CBT-based workplace intervention literature.',
-     cite:'Hassard et al. Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Report'},
-    {t:'3. Presenteeism Recovery  —  $'+fmt(d.pressSavings)+'/year',
-     b:'Presenteeism — working while cognitively and emotionally impaired — costs organizations 2–3× more than absenteeism yet is invisible on most balance sheets. Kessler et al. (2006) at Harvard Medical School estimated that employees with depression and anxiety disorders lose an average of 27 productive days per year, representing approximately 7.5% of annual salary in lost output. The Aetna MBSR program (2015) demonstrated a 28% reduction in perceived stress and a 20% improvement in sleep quality, directly correlating with productivity recovery. Leadership EQ training amplifies this effect by creating psychologically safe environments where employees perform at higher cognitive capacity.',
-     cite:'Kessler et al. JAMA (2006); Aetna Mind Health Program Outcomes (2015); Goleman, Emotional Intelligence (1995)'},
-    {t:'4. Voluntary Turnover Reduction  —  $'+fmt(d.turnoverSavings)+'/year',
-     b:'SHRM\'s 2022 Benchmarking Survey established the average cost of replacing an employee at 50–200% of annual salary, with a conservative midpoint of 75% used in this model. Gallup\'s 2023 State of the Global Workplace report demonstrates that highly engaged teams show 43% lower voluntary turnover. Meta-analytic research by Harter et al. (Gallup, 2020) across 276 organizations found engagement is directly linked to psychological safety and emotional resilience — precisely the competencies developed by SkillfulMeans programs. Even a 1% improvement in retention generates meaningful ROI for mid-market organizations.',
-     cite:'SHRM Benchmarking Report (2022); Gallup State of the Workplace (2023); Harter et al. Gallup Meta-Analysis (2020)'},
+    {t:'1. Medical Claims Reduction — $'+fmt(d.medSavings)+'/year',
+     b:'Mental and emotional distress drives 50–70% of all primary care visits. The MGH MBSR study (Friedman et al., 2012) demonstrated a 43% reduction in total healthcare utilization within 12 months of a mindfulness program. Harvard\'s Baicker meta-analysis (2010) found $3.27 in medical savings per $1 invested. The IMPACT trial (Unutzer et al., JAMA 2002) found integrated behavioral health reduced total medical costs by $3,363 per patient over 4 years. Stress triggers elevated cortisol, impaired immunity, cardiovascular strain, and GI disorders — all generating costly downstream medical events.',
+     cite:'Baicker, Cutler & Song, Health Affairs (2010); Friedman et al., J Altern Complement Med (2012); Unutzer et al., JAMA (2002); Goetzel et al., JOEM (2016)'},
+    {t:'2. Absenteeism Reduction — $'+fmt(d.absSavings)+'/year',
+     b:'Hassard et al. (Work & Stress, 2018) found stress-related claims result in 3x longer absences than physical injury claims. NIOSH data establishes that 40% of all unplanned absence is stress-attributed. Hemp (Harvard Business Review, 2004) estimated mental-health-driven absence costs $603 per worker per year. SkillfulMeans\' 14-day challenges and weekly classes build the behavioral infrastructure that reduces stress-driven absence by approximately 28%, consistent with CBT-based workplace intervention research.',
+     cite:'Hassard et al., Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Report'},
+    {t:'3. Presenteeism Recovery — $'+fmt(d.pressSavings)+'/year',
+     b:'Presenteeism — working while cognitively impaired — costs 2–3x more than absenteeism yet rarely appears on a balance sheet. Kessler et al. (JAMA, 2006) estimated stressed employees lose ~27 productive days per year (~7.5% of salary). The Aetna MBSR program (2015) found a 28% stress reduction with direct productivity gains. Loeppke et al. (JOEM, 2009) found mental health programs reduce presenteeism by 17–25%. Wang et al. (JOEM, 2007) found a 6:1 ROI for mental health programs overall.',
+     cite:'Kessler et al., JAMA (2006); Aetna Mind Health (2015); Loeppke et al., JOEM (2009); Wang et al., JOEM (2007); WHO (2022)'},
+    {t:'4. Voluntary Turnover Reduction — $'+fmt(d.turnoverSavings)+'/year',
+     b:'SHRM (2022) puts replacement cost at 75% of annual salary. Gallup (2023) finds highly engaged teams show 43% lower voluntary turnover over time. Harter et al.\'s meta-analysis across 276 organizations links psychological safety and EQ — the core competencies SkillfulMeans builds — directly to engagement. Lyubomirsky et al. (Psychological Bulletin, 2005) confirmed positive affect from mindfulness predicts job satisfaction and retention. This model caps the improvement at 12% — a conservative program-level estimate for 1–3 year timeframes.',
+     cite:'SHRM Benchmarking (2022); Gallup (2023); Harter et al. (2020); Lyubomirsky et al., Psych Bulletin (2005)'},
   ];
 
-  let yp=38;
-  exps.forEach(ex=>{
-    if(yp>245){doc.addPage();yp=20;}
-    doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
-    const tLines=doc.splitTextToSize(ex.t,W-24);
-    doc.text(tLines,12,yp);yp+=tLines.length*5+3;
-    doc.setTextColor(55,55,55);doc.setFontSize(8);doc.setFont('helvetica','normal');
-    const bLines=doc.splitTextToSize(ex.b,W-24);
-    doc.text(bLines,12,yp);yp+=bLines.length*4.2+3;
-    doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','italic');
-    doc.text('Sources: '+ex.cite,12,yp);yp+=5;
-    doc.setDrawColor(220,220,220);doc.line(12,yp,W-12,yp);yp+=8;
-  });
+  const SAFE_Y=H-22;
+  exps.forEach(ex=>{ y=textBlock(ex.t,ex.b,ex.cite,y,SAFE_Y); });
 
-  // ── PAGE 3: Driver 5 + Next Steps ─────────────────────────────
+  // ════════════════════════════════════════════════════════════════
+  // PAGE 3 — Driver 5 + Next Steps
+  // ════════════════════════════════════════════════════════════════
   doc.addPage();
-  doc.setFillColor(74,32,64);doc.rect(0,0,W,30,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Results Continued + Recommended Next Steps',12,20);
+  y=pageHeader("Results Continued + Recommended Next Steps", "Workers' compensation driver explanation and your pathway to getting started");
 
-  const exps2=[
-    {t:"5. Workers' Comp BH Comorbidity  —  $"+fmt(d.wcSavings)+'/year',
-     b:"NCCI (National Council on Compensation Insurance) research demonstrates that workers' compensation claims carrying behavioral health comorbidities cost 2–4× more in total settlement and last 3× longer in claim duration. WorkCare's Behavioral Health Cost Analysis estimates approximately 25% of all WC claims have a significant behavioral health component. Crucially, intervening with structured mental fitness programming within the first 90 days of a claim reduces claim duration by 60–70% and total cost proportionally. This driver often represents the most compelling ROI argument for CFOs managing self-funded plans, since it directly reduces stop-loss exposure.",
-     cite:"NCCI Research Brief: Behavioral Health and Workers' Comp Cost Drivers (2021); WorkCare Behavioral Health Analysis (2020)"},
+  // Driver 5
+  const exp5={
+    t:"5. Workers' Comp BH Comorbidity — $"+fmt(d.wcSavings)+'/year',
+    b:"NCCI (2021) demonstrates that WC claims with behavioral health comorbidities cost 2–4x more and last 3x longer. WorkCare's Behavioral Health Cost Analysis estimates 25% of all WC claims carry a significant BH component. Early mental fitness intervention within 90 days reduces claim duration by 60–70%. Strosahl (2004) found integrated behavioral health reduces primary care and ER utilization by 20–30%. This driver often surprises CFOs most — and directly reduces stop-loss exposure for self-funded plans. A conservative 12% improvement cap is applied, scaled by combined participation and program effectiveness.",
+    cite:"NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)"
+  };
+  y=textBlock(exp5.t,exp5.b,exp5.cite,y,H-22);
+  y+=4;
+
+  // Methodology note
+  doc.setFillColor(248,247,244);
+  doc.setDrawColor(210,205,200);
+  doc.setLineWidth(0.25);
+  const methText='Model methodology: All savings scale by (Participation Rate x Stage Effectiveness). Ramp-up applied: Year 1 = 45%, Year 2 = 80%, Year 3 = 100%. Conservative lower-bound estimates from each study used throughout. Projections are evidence-based estimates; actual results vary by organization, industry, and implementation quality. This model does not constitute a guarantee of financial performance or medical outcomes.';
+  const methLines=doc.splitTextToSize(methText,CW-8);
+  const methH=10+methLines.length*4;
+  doc.roundedRect(M,y,CW,methH,2,2,'FD');
+  doc.setTextColor(120,115,112);
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica','italic');
+  doc.text(methLines,M+4,y+7);
+  y+=methH+12;
+
+  // Next steps section
+  y=sectionLabel('Recommended Engagement Pathway', y);
+  doc.setTextColor(55,50,48);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  const introText='Start with a single 1-hour Interactive Wellness Workshop at $1,500 — fully fundable through carrier wellness dollars. Every workshop includes a paired 14-day team challenge, recorded materials, and a branded employee workbook.';
+  const introLines=doc.splitTextToSize(introText,CW);
+  doc.text(introLines,M,y);
+  y+=introLines.length*4.8+8;
+
+  const steps=[
+    ['1. Single Workshop ($1,500)','Experience quality firsthand — low risk, high signal. Fully fundable through wellness dollars.'],
+    ['2. 14-Day Team Challenge','Embed workshop skills into daily habits. Gamified, coach-facilitated, measurable.'],
+    ['3. Workshop Series','Build a comprehensive mental fitness foundation across multiple team competencies.'],
+    ['4. Leadership EQ Program','Drive culture change from the top. Includes 360 assessment and ROI report.'],
+    ['5. Wellness Boxes + Classes','Sustain engagement and signal that wellbeing is a strategic priority.'],
+    ['6. Annual ROI Report','Demonstrate measurable financial impact to the CFO and renew with confidence.'],
   ];
 
-  let yp3=38;
-  exps2.forEach(ex=>{
-    doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
-    const tLines=doc.splitTextToSize(ex.t,W-24);
-    doc.text(tLines,12,yp3);yp3+=tLines.length*5+3;
-    doc.setTextColor(55,55,55);doc.setFontSize(8);doc.setFont('helvetica','normal');
-    const bLines=doc.splitTextToSize(ex.b,W-24);
-    doc.text(bLines,12,yp3);yp3+=bLines.length*4.2+3;
-    doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','italic');
-    doc.text('Sources: '+ex.cite,12,yp3);yp3+=5;
-    doc.setDrawColor(220,220,220);doc.line(12,yp3,W-12,yp3);yp3+=8;
+  steps.forEach(([title, desc])=>{
+    doc.setFillColor(252,250,248);
+    doc.roundedRect(M,y,CW,14,2,2,'F');
+    doc.setFillColor(15,118,110);
+    doc.rect(M,y,3,14,'F');
+    doc.setTextColor(30,25,22);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','bold');
+    doc.text(title,M+7,y+5.5);
+    doc.setTextColor(80,75,72);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica','normal');
+    doc.text(desc,M+7,y+10.5);
+    y+=16;
   });
 
-  // Next Steps
-  yp3+=4;
-  doc.setTextColor(74,32,64);doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text('Recommended Next Steps',12,yp3);yp3+=8;
-  const entryT='Start with a single 1-hour Interactive Wellness Workshop at $1,500 — fully fundable through carrier wellness dollars. This is the no-risk entry point to experience SkillfulMeans quality firsthand. Every workshop includes a paired 14-day team challenge, recorded materials, and a branded employee workbook. The full program below reflects complete engagement with Leadership EQ, ongoing challenges, and wellness incentives.';
-  const el=doc.splitTextToSize(entryT,W-24);
-  doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);doc.text(el,12,yp3);yp3+=el.length*4.5+6;
+  y+=6;
+  // CTA box
+  doc.setFillColor(74,32,64);
+  doc.roundedRect(M,y,CW,28,4,4,'F');
+  doc.setFillColor(15,118,110);
+  doc.roundedRect(M,y+22,CW,6,0,0,'F');
+  doc.roundedRect(M,y+22,CW,8,4,4,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica','bold');
+  doc.text('Ready to present this to your client?',W/2,y+10,{align:'center'});
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(210,230,225);
+  doc.text('Book a 15-minute strategy call — no commitment required',W/2,y+18,{align:'center'});
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica','bold');
+  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,y+26,{align:'center'});
 
-  ['1. Single Workshop ($1,500) — Experience quality firsthand, zero risk','2. 14-Day Team Challenge — Embed skills into daily habits','3. Workshop Series — Build complete mental fitness foundation','4. Leadership EQ Program — Drive culture change from the top down','5. Wellness Boxes + Classes — Sustain engagement, reward participation','6. Annual ROI Report — Demonstrate measurable impact to the CFO'].forEach(s=>{
-    doc.setFillColor(74,32,64);doc.circle(15,yp3-1,1.5,'F');
-    doc.setFontSize(8.5);doc.setTextColor(60,60,60);doc.text(s,20,yp3);yp3+=6.5;
-  });
-
-  yp3+=6;
-  doc.setFillColor(15,118,110);doc.roundedRect(12,yp3,W-24,26,5,5,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');
-  doc.text('Ready to present this to your client?',W/2,yp3+10,{align:'center'});
-  doc.setFontSize(8.5);doc.setFont('helvetica','normal');
-  doc.text('Book a 15-minute strategy call: calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,yp3+19,{align:'center'});
-
+  // Add footers to all pages
   const totalPages=doc.internal.getNumberOfPages();
   for(let i=1;i<=totalPages;i++){doc.setPage(i);footer(i,totalPages);}
   return doc;
