@@ -295,6 +295,14 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 
     <!-- RESULTS RIGHT COLUMN (locked) -->
     <div style="position:relative">
+      <!-- PDF STRIP (shown after unlock) -->
+  <div id="pdf-strip" style="display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:#0f766e;border-radius:2rem;padding:1.5rem 2rem;color:white;margin-bottom:1.5rem">
+    <div><h3 class="font-bold text-lg">Your PDF Report Is Ready</h3><p style="color:#99f6e4;font-size:.875rem;margin-top:.25rem">3-page report with driver explanations, methodology, and next steps.</p></div>
+    <div style="display:flex;gap:1rem;align-items:center">
+      <button onclick="downloadPDF()" style="background:white;color:#0f766e;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none">📥 Download PDF</button>
+      <button onclick="emailReport()" id="emailPDFBtn" style="background:rgba(255,255,255,.2);color:white;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:1px solid rgba(255,255,255,.3)">📧 Email Me</button>
+    </div>
+  </div>
       <div id="results-blur-container" class="results-blur space-y-5">
         <!-- 3-Year Hero -->
         <div class="bg-brand-teal rounded-[2.5rem] p-8 text-white shadow-lg text-center relative overflow-hidden">
@@ -342,14 +350,6 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
     </div>
   </div>
 
-  <!-- PDF STRIP (shown after unlock) -->
-  <div id="pdf-strip" style="display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:#0f766e;border-radius:2rem;padding:1.5rem 2rem;color:white;margin-bottom:1.5rem">
-    <div><h3 class="font-bold text-lg">Your PDF Report Is Ready</h3><p style="color:#99f6e4;font-size:.875rem;margin-top:.25rem">3-page report with driver explanations, methodology, and next steps.</p></div>
-    <div style="display:flex;gap:1rem;align-items:center">
-      <button onclick="downloadPDF()" style="background:white;color:#0f766e;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none">📥 Download PDF</button>
-      <button onclick="emailReport()" id="emailPDFBtn" style="background:rgba(255,255,255,.2);color:white;padding:.75rem 1.5rem;border-radius:9999px;font-weight:900;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:1px solid rgba(255,255,255,.3)">📧 Email Me</button>
-    </div>
-  </div>
 
   <!-- 3-YEAR CHART -->
   <div class="bg-plum rounded-[3rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden mb-8">
