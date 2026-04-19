@@ -55,7 +55,7 @@ app.post('/api/submit', async (req, res) => {
     console.log('nodemailer loaded:', typeof nodemailer.createTransport);
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: 587,
+      port: 465,
       secure: false,
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     });
