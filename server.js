@@ -2,21 +2,20 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'roi-calculator.html'));
 });
 
 const PORT = process.env.PORT || 3000;
-
 function fmt(n) { return Math.round(n).toLocaleString(); }
 
 app.post('/api/submit', async (req, res) => {
   const data = req.body;
   console.log('Submit received for:', data.email);
 
-  // Google Sheets
+  // ── Google Sheets ───────────────────────────────────────────────
   try {
     const { google } = require('googleapis');
     let key = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/^["']|["']$/g, '').replace(/\\n/g, '\n');
@@ -42,72 +41,121 @@ app.post('/api/submit', async (req, res) => {
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'ROI Leads!A:X',
       valueInputOption: 'RAW',
-      requestBody: { values: [[new Date().toISOString(), data.firstName, data.lastName, data.email, data.company, data.phone||'', data.employees, data.avgSalary, data.healthPremium, data.stressRate, data.participRate, data.turnoverRate, data.absDays, data.eapPct, data.investment, data.medSavings, data.absSavings, data.pressSavings, data.turnoverSavings, data.wcSavings, data.annualSavings, data.total3yr, data.netROI, data.paybackMonths]] }
+      requestBody: { values: [[
+        new Date().toISOString(),
+        data.firstName, data.lastName, data.email, data.company, data.phone||'',
+        data.employees, data.avgSalary, data.healthPremium,
+        data.stressRate, data.participRate, data.turnoverRate,
+        data.absDays, data.eapPct, data.investment,
+        data.medSavings, data.absSavings, data.pressSavings,
+        data.turnoverSavings, data.wcSavings,
+        data.annualSavings, data.total3yr, data.netROI, data.paybackMonths
+      ]] }
     });
     console.log('Google Sheets: success');
   } catch(err) {
     console.error('Sheets error:', err.message);
   }
 
-  // Email via SendGrid
+  // ── Email via SendGrid ──────────────────────────────────────────
   try {
     const sgMail = require('@sendgrid/mail');
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    const html = `<!DOCTYPE html><html><head><style>
+    const brokerHtml = `<!DOCTYPE html><html><head><style>
       body{font-family:Arial,sans-serif;background:#fdfbf7;margin:0;color:#1c1917}
       .wrap{max-width:580px;margin:0 auto;padding:32px 20px}
       .hdr{background:#4a2040;color:white;border-radius:16px 16px 0 0;padding:28px 32px}
-      .hdr h1{margin:0;font-size:22px;font-weight:800}
+      .hdr h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-0.5px}
+      .hdr p{margin:6px 0 0;font-size:13px;opacity:.75}
       .body{background:white;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 16px 16px;padding:28px 32px}
       .kpis{display:flex;gap:12px;margin:20px 0}
-      .kpi{flex:1;background:#f9f7f4;border-radius:12px;padding:14px;text-align:center}
-      .kpi b{display:block;font-size:22px;color:#4a2040}
-      .kpi small{font-size:10px;text-transform:uppercase;color:#78716c}
-      .dr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0eeec;font-size:13px}
-      .cta{background:#0f766e;color:white;display:block;text-align:center;padding:16px;border-radius:50px;font-weight:800;font-size:13px;text-decoration:none;margin:24px 0 0}
+      .kpi{flex:1;background:#f9f7f4;border-radius:12px;padding:14px;text-align:center;border:1px solid #e5e7eb}
+      .kpi-val{display:block;font-size:22px;font-weight:800;color:#4a2040;margin-bottom:4px}
+      .kpi-lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#78716c}
+      .section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#78716c;margin:20px 0 10px}
+      .dr{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0eeec;font-size:13px}
+      .dr-label{color:#57534e;font-weight:500}
+      .dr-val{font-weight:800;color:#4a2040;margin-left:16px}
+      .total-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:2px solid #e5e7eb;margin-top:4px}
+      .total-label{font-weight:800;font-size:14px;color:#1c1917}
+      .total-val{font-weight:800;font-size:16px;color:#4a2040;margin-left:16px}
+      .disclaimer{background:#f9f7f4;border-left:3px solid #4a2040;border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:#57534e;line-height:1.6;margin:20px 0}
+      .cta{background:#4a2040;color:#ffffff !important;display:block;text-align:center;padding:16px 24px;border-radius:50px;font-weight:800;font-size:14px;text-decoration:none;margin:24px 0 0;letter-spacing:.04em}
+      .pdf-note{background:#f0fdf9;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;font-size:12px;color:#065f46;margin:16px 0;text-align:center}
+      .foot{text-align:center;font-size:11px;color:#a8a29e;margin-top:20px;line-height:1.6}
     </style></head><body><div class="wrap">
-      <div class="hdr"><h1>skillfulmeans</h1><p style="margin:6px 0 0;opacity:.75">ROI Analysis — ${data.firstName} at ${data.company}</p></div>
-      <div class="body">
-        <p>Hi ${data.firstName},</p>
-        <p>Here's your ROI analysis for a <strong>${parseInt(data.employees).toLocaleString()}-person workforce</strong>.</p>
-        <div class="kpis">
-          <div class="kpi"><b>$${fmt(data.total3yr)}</b><small>3-Year Impact</small></div>
-          <div class="kpi"><b>${Math.round(data.netROI)}%</b><small>Net ROI</small></div>
-          <div class="kpi"><b>${data.paybackMonths} mo</b><small>Payback</small></div>
-        </div>
-        <div class="dr"><span>Medical Claims</span><strong>$${fmt(data.medSavings)}</strong></div>
-        <div class="dr"><span>Absenteeism</span><strong>$${fmt(data.absSavings)}</strong></div>
-        <div class="dr"><span>Presenteeism</span><strong>$${fmt(data.pressSavings)}</strong></div>
-        <div class="dr"><span>Turnover</span><strong>$${fmt(data.turnoverSavings)}</strong></div>
-        <div class="dr" style="border:none"><span>Workers Comp</span><strong>$${fmt(data.wcSavings)}</strong></div>
-        <div class="dr" style="border-top:2px solid #e5e7eb"><strong>Annual Savings</strong><strong>$${fmt(data.annualSavings)}</strong></div>
-        <a href="https://calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2" class="cta">Book a 15-Min Strategy Call →</a>
+      <div class="hdr">
+        <h1>skillfulmeans</h1>
+        <p>Mental Fitness ROI Analysis &mdash; ${data.firstName} at ${data.company}</p>
       </div>
+      <div class="body">
+        <p style="font-size:15px;font-weight:600;margin-bottom:4px">Hi ${data.firstName},</p>
+        <p style="font-size:14px;color:#57534e;line-height:1.6;margin-top:4px">Here's your ROI analysis for a <strong>${parseInt(data.employees).toLocaleString()}-person workforce</strong> at ${Math.round(data.participRate)}% program participation. Your full PDF report is attached.</p>
+
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-val">$${fmt(data.total3yr)}</span><span class="kpi-lbl">3-Year Impact</span></div>
+          <div class="kpi"><span class="kpi-val">${Math.round(data.netROI)}%</span><span class="kpi-lbl">Net ROI</span></div>
+          <div class="kpi"><span class="kpi-val">${data.paybackMonths} mo</span><span class="kpi-lbl">Payback</span></div>
+        </div>
+
+        <div class="disclaimer">
+          <strong>Full Engagement Model:</strong> These figures reflect a complete SkillfulMeans program including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Want to experience the quality before the full investment? A single workshop starts at $1,500.
+        </div>
+
+        <p class="section-title">Annual Savings by Driver</p>
+        <div class="dr"><span class="dr-label">Medical Claims Reduction</span><span class="dr-val">$${fmt(data.medSavings)}</span></div>
+        <div class="dr"><span class="dr-label">Absenteeism Reduction</span><span class="dr-val">$${fmt(data.absSavings)}</span></div>
+        <div class="dr"><span class="dr-label">Presenteeism Recovery</span><span class="dr-val">$${fmt(data.pressSavings)}</span></div>
+        <div class="dr"><span class="dr-label">Voluntary Turnover Reduction</span><span class="dr-val">$${fmt(data.turnoverSavings)}</span></div>
+        <div class="dr" style="border:none"><span class="dr-label">Workers&rsquo; Comp BH Comorbidity</span><span class="dr-val">$${fmt(data.wcSavings)}</span></div>
+        <div class="total-row"><span class="total-label">Projected Annual Savings</span><span class="total-val">$${fmt(data.annualSavings)}</span></div>
+
+        <div class="pdf-note">📎 Your full 3-page analysis with study citations and next steps is attached to this email.</div>
+
+        <a href="https://calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2" class="cta">Book a 15-Min Strategy Call &rarr;</a>
+
+        <p style="font-size:12px;color:#78716c;margin-top:20px;line-height:1.6">Questions? Visit <a href="https://www.skillfulmeans.life" style="color:#4a2040;font-weight:600">skillfulmeans.life</a></p>
+      </div>
+      <div class="foot">skillfulmeans.life &middot; Confidential &mdash; prepared for broker use only</div>
     </div></body></html>`;
 
-    // Send to broker
-    await sgMail.send({
+    // Build attachments array if PDF was sent
+    const attachments = [];
+    if (data.pdfBase64) {
+      attachments.push({
+        content: data.pdfBase64,
+        filename: `SkillfulMeans-ROI-${(data.company||'Analysis').replace(/\s+/g,'-')}.pdf`,
+        type: 'application/pdf',
+        disposition: 'attachment'
+      });
+    }
+
+    // Broker confirmation email
+    const brokerMsg = {
       to: data.email,
       from: { email: 'admin@skillfulmeans.life', name: 'SkillfulMeans' },
       subject: `Your SkillfulMeans ROI Analysis — ${data.company}`,
-      html
-    });
+      html: brokerHtml
+    };
+    if (attachments.length > 0) brokerMsg.attachments = attachments;
+    await sgMail.send(brokerMsg);
     console.log('Broker email: success');
 
-    // Send lead notification
+    // Internal lead notification
     if (process.env.NOTIFY_EMAIL) {
       await sgMail.send({
         to: process.env.NOTIFY_EMAIL,
         from: { email: 'admin@skillfulmeans.life', name: 'SkillfulMeans ROI' },
-        subject: `New Lead: ${data.firstName} ${data.lastName} — ${data.company} ($${fmt(data.total3yr)})`,
-        text: `New lead\n\nName: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nCompany: ${data.company}\nPhone: ${data.phone||'n/a'}\n\n3-Year Impact: $${fmt(data.total3yr)}\nROI: ${Math.round(data.netROI)}%\nPayback: ${data.paybackMonths} months\nAnnual Savings: $${fmt(data.annualSavings)}\n\nAdd to Notion CRM as Warmed up lead`
+        subject: `🎯 New Lead: ${data.firstName} ${data.lastName} — ${data.company} ($${fmt(data.total3yr)} 3-yr)`,
+        text: `New lead from the SkillfulMeans ROI Calculator\n\nNAME: ${data.firstName} ${data.lastName}\nEMAIL: ${data.email}\nCOMPANY: ${data.company}\nPHONE: ${data.phone||'Not provided'}\n\nANALYSIS:\n  Employees: ${parseInt(data.employees).toLocaleString()}\n  Participation: ${data.participRate}%\n  Investment: $${fmt(data.investment)}/year\n\n  Annual Savings: $${fmt(data.annualSavings)}\n  3-Year Impact: $${fmt(data.total3yr)}\n  Net ROI: ${Math.round(data.netROI)}%\n  Payback: ${data.paybackMonths} months\n\nNEXT STEP: Add to Notion CRM as "Warmed up lead"`
       });
       console.log('Lead notification: success');
     }
+
   } catch(err) {
     console.error('Email error:', err.message);
-    if (err.response) console.error('SendGrid error details:', JSON.stringify(err.response.body));
+    if (err.response) console.error('SendGrid details:', JSON.stringify(err.response.body));
   }
 
   res.json({ success: true });
