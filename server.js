@@ -7,7 +7,6 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Explicit root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'roi-calculator.html'));
 });
@@ -15,17 +14,29 @@ app.get('/', (req, res) => {
 const PORT                = process.env.PORT || 3000;
 const GOOGLE_SHEET_ID     = process.env.GOOGLE_SHEET_ID;
 const GOOGLE_CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
-const GOOGLE_PRIVATE_KEY  = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 const NOTIFY_EMAIL        = process.env.NOTIFY_EMAIL;
 const SMTP_HOST           = process.env.SMTP_HOST;
 const SMTP_USER           = process.env.SMTP_USER;
 const SMTP_PASS           = process.env.SMTP_PASS;
 
+// Fix private key formatting — handles all edge cases
+function getPrivateKey() {
+  let key = process.env.GOOGLE_PRIVATE_KEY || '';
+  // Remove surrounding quotes if present
+  key = key.replace(/^["']|["']$/g, '');
+  // Replace literal \n with real newlines
+  key = key.replace(/\\n/g, '\n');
+  return key;
+}
+
 async function appendToSheet(data) {
-  const auth = new google.auth.JWT(
-    GOOGLE_CLIENT_EMAIL, null, GOOGLE_PRIVATE_KEY,
-    ['https://www.googleapis.com/auth/spreadsheets']
-  );
+  const privateKey = getPrivateKey();
+  const auth = new google.auth.JWT({
+    email: GOOGLE_CLIENT_EMAIL,
+    key: privateKey,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  });
+
   const sheets = google.sheets({ version: 'v4', auth });
 
   const check = await sheets.spreadsheets.values.get({
@@ -74,7 +85,8 @@ async function appendToSheet(data) {
 function createTransporter() {
   return nodemailer.createTransporter({
     host: SMTP_HOST || 'smtp.gmail.com',
-    port: 587, secure: false,
+    port: 587,
+    secure: false,
     auth: { user: SMTP_USER, pass: SMTP_PASS }
   });
 }
@@ -136,26 +148,38 @@ async function sendLeadNotification(data) {
   await transporter.sendMail({
     from: `"SkillfulMeans ROI Tool" <${SMTP_USER}>`,
     to: NOTIFY_EMAIL,
-    subject: `🎯 New ROI Lead: ${data.firstName} ${data.lastName} — ${data.company} ($${fmt(data.total3yr)} 3-yr)`,
-    text: `New lead from the SkillfulMeans ROI Calculator\n\nNAME: ${data.firstName} ${data.lastName}\nEMAIL: ${data.email}\nCOMPANY: ${data.company}\nPHONE: ${data.phone || 'Not provided'}\n\nANALYSIS:\n  Employees: ${parseInt(data.employees).toLocaleString()}\n  Participation: ${data.participRate}%\n  Investment: $${fmt(data.investment)}/year\n  Annual Savings: $${fmt(data.annualSavings)}\n  3-Year Impact: $${fmt(data.total3yr)}\n  Net ROI: ${Math.round(data.netROI)}%\n  Payback: ${data.paybackMonths} months\n\nNEXT STEP: Add to Notion CRM → "Warmed up lead"`
+    subject: `New ROI Lead: ${data.firstName} ${data.lastName} — ${data.company} ($${fmt(data.total3yr)} 3-yr)`,
+    text: `New lead from the SkillfulMeans ROI Calculator\n\nNAME: ${data.firstName} ${data.lastName}\nEMAIL: ${data.email}\nCOMPANY: ${data.company}\nPHONE: ${data.phone || 'Not provided'}\n\nANALYSIS:\n  Employees: ${parseInt(data.employees).toLocaleString()}\n  Participation: ${data.participRate}%\n  Investment: $${fmt(data.investment)}/year\n  Annual Savings: $${fmt(data.annualSavings)}\n  3-Year Impact: $${fmt(data.total3yr)}\n  Net ROI: ${Math.round(data.netROI)}%\n  Payback: ${data.paybackMonths} months\n\nNEXT STEP: Add to Notion CRM as Warmed up lead`
   });
 }
 
 app.post('/api/submit', async (req, res) => {
   try {
     const data = req.body;
-    if (GOOGLE_SHEET_ID && GOOGLE_CLIENT_EMAIL && GOOGLE_PRIVATE_KEY) {
+    console.log('Submit received for:', data.email);
+
+    if (GOOGLE_SHEET_ID && GOOGLE_CLIENT_EMAIL) {
+      console.log('Writing to Google Sheets...');
       await appendToSheet(data);
+      console.log('Google Sheets: success');
     }
+
     if (SMTP_USER && SMTP_PASS && data.email) {
+      console.log('Sending broker email...');
       await sendBrokerEmail(data);
+      console.log('Broker email: success');
     }
+
     if (SMTP_USER && SMTP_PASS && NOTIFY_EMAIL) {
+      console.log('Sending lead notification...');
       await sendLeadNotification(data);
+      console.log('Lead notification: success');
     }
+
     res.json({ success: true });
   } catch (err) {
-    console.error('Submit error:', err);
+    console.error('Submit error:', err.message);
+    console.error(err.stack);
     res.status(500).json({ success: false, error: err.message });
   }
 });
