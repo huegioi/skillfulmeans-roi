@@ -4,9 +4,18 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 
 const app = express();
+const express = require('express');
+const { google } = require('googleapis');
+const nodemailer = require('nodemailer');
+const path = require('path');
+
+const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'roi-calculator.html'));
+});
 // ── CONFIG (set these in Railway environment variables) ────────────
 const PORT                = process.env.PORT || 3000;
 const GOOGLE_SHEET_ID     = process.env.GOOGLE_SHEET_ID;
