@@ -225,9 +225,8 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
     <p class="text-stone-500 mt-3 font-medium text-lg leading-relaxed max-w-2xl mx-auto">Enter your client's workforce profile. Customize program participation. Unlock your results and download a PDF report ready for your next client meeting.</p>
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-8 mb-10">
-    <!-- INPUTS LEFT COLUMN -->
-    <div class="space-y-6">
+  <!-- Cards 1 + 2: Full width -->
+  <div class="space-y-6 mb-8">
 
       <!-- Card 1: Workforce Profile -->
       <div class="bg-white rounded-[2.5rem] border border-stone-200 p-8 shadow-sm space-y-6">
@@ -276,7 +275,11 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
           <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>1%</span><span>20%</span></div>
         </div>
       </div>
+  </div><!-- end full-width cards -->
 
+  <!-- Card 3 + Results: Side by side -->
+  <div class="grid lg:grid-cols-2 gap-8 mb-10 items-start">
+    <div>
       <!-- Card 3: Engagement Stage Selector -->
       <div class="bg-plum rounded-[2.5rem] p-8 shadow-sm text-white space-y-5 relative overflow-hidden">
         <div class="circle-bg w-32 h-32 bg-white/5 -top-10 -right-10"></div>
@@ -324,7 +327,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
           <strong>Wellness Dollar Tip:</strong> Cigna, BCBS, and United clients commonly leave $10k–$75k in wellness funds unspent annually. Most stages 1–5 can be fully funded at zero net cost.
         </div>
       </div>
-    </div>
+    </div><!-- end Card 3 -->
 
     <!-- RESULTS RIGHT COLUMN (locked) -->
     <div style="position:relative">
