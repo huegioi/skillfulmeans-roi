@@ -880,7 +880,11 @@ function runCalculator(){
   // SOURCE C: Lyubomirsky et al., Psychological Bulletin (2005)
   //   Positive affect (outcome of EQ/mindfulness training) predicts job satisfaction
   //   and organizational commitment — both key retention drivers
-  const retentionImprovement = Math.min(0.43, 0.43 * pf); // capped at Gallup 43% maximum
+  // Gallup 43% lower turnover applies to fully engaged organizations over many years.
+  // For a workplace mental fitness program, a conservative realistic improvement is
+  // 8–12% reduction in voluntary turnover — scaled by combined participation × effectiveness.
+  // Sources: Gallup (2023); Harter et al. (2020); Lyubomirsky et al. (2005)
+  const retentionImprovement = Math.min(0.12, pf * 0.15); // max 12% — defensible upper bound
   const turnoverSavings = employees * turnoverRate * (avgSalary * 0.75) * retentionImprovement;
 
   // ── Driver 5: Workers' Comp BH Comorbidity ─────────────────────
@@ -1063,7 +1067,7 @@ function buildPDFDoc(){
   doc.setTextColor(74,32,64);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Projected Annual Savings: $'+fmt(d.annualSavings),12,175);
   doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(50,50,50);doc.text('ANNUAL SAVINGS BY DRIVER',12,183);
 
-  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR (2015) + WHO (2022)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking (2022) + Gallup (2023) + Harter et al. Meta-Analysis (2020)'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
+  const drivers=[{n:'Medical Claims Reduction',v:d.medSavings,s:'Baicker et al. (2010) + MGH MBSR Study (Friedman et al., 2012)'},{n:'Absenteeism Reduction',v:d.absSavings,s:'Baicker (2010) + Hassard et al. (2018) · NIOSH stress-attribution data'},{n:'Presenteeism Recovery',v:d.pressSavings,s:'Kessler et al. Harvard Med (2006) + Aetna MBSR (2015) + WHO (2022)'},{n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM (2022) + Gallup (2023) + Harter et al. (2020) · 12% max improvement — conservative program-level estimate'},{n:"Workers' Comp BH Comorbidity",v:d.wcSavings,s:'NCCI Research (2021) + WorkCare Behavioral Health Cost Analysis'}];
   let yy=190;
   drivers.forEach((dr,i)=>{doc.setFillColor(i%2===0?248:255,i%2===0?247:255,i%2===0?244:255);doc.rect(12,yy-4,W-24,14,'F');doc.setFillColor(74,32,64);doc.rect(12,yy-4,3,14,'F');doc.setTextColor(40,40,40);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.text(dr.n,19,yy+2);doc.setTextColor(120,120,120);doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(dr.s,19,yy+7);doc.setTextColor(74,32,64);doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.text('$'+fmt(dr.v),W-12,yy+3,{align:'right'});yy+=15;});
 
