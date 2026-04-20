@@ -46,7 +46,7 @@ app.post('/api/submit', async (req, res) => {
         data.firstName, data.lastName, data.email, data.company, data.phone||'',
         data.employees, data.avgSalary, data.healthPremium,
         data.stressRate, data.participRate, data.turnoverRate,
-        data.absDays, data.eapPct, data.investment,
+        data.absDays, data.eapPct, data.investment, data.wellnessFund||0,
         data.medSavings, data.absSavings, data.pressSavings,
         data.turnoverSavings, data.wcSavings,
         data.annualSavings, data.total3yr, data.netROI, data.paybackMonths
@@ -92,6 +92,7 @@ app.post('/api/submit', async (req, res) => {
       <div class="body">
         <p style="font-size:15px;font-weight:600;margin-bottom:4px">Hi ${data.firstName},</p>
         <p style="font-size:14px;color:#57534e;line-height:1.6;margin-top:4px">Here's your ROI analysis for a <strong>${parseInt(data.employees).toLocaleString()}-person workforce</strong> at ${Math.round(data.participRate)}% program participation. Your full PDF report is attached.</p>
+        ${(data.wellnessFund > 0) ? `<div style="background:#f0fdf9;border:1px solid #6ee7b7;border-radius:10px;padding:10px 14px;font-size:12px;color:#065f46;margin:12px 0"><strong>Wellness Fund Available:</strong> $${Math.round(data.wellnessFund).toLocaleString()} — estimated out-of-pocket after funding: <strong>$${Math.max(0,Math.round((data.investment||0)-(data.wellnessFund||0))).toLocaleString()}</strong></div>` : ''}
 
         <div class="kpis">
           <div class="kpi"><span class="kpi-val">$${fmt(data.total3yr)}</span><span class="kpi-lbl">3-Year Impact</span></div>
