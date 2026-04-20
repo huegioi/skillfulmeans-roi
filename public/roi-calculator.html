@@ -245,6 +245,12 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
           <input type="range" id="inp-stress" min="10" max="80" step="1" value="40" class="w-full">
           <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>10%</span><span>80%</span></div>
         </div>
+        <div class="bg-brand-teal/5 border border-brand-teal/20 rounded-2xl p-5">
+          <label class="block text-[10px] font-black uppercase tracking-widest text-brand-teal mb-1">Available Carrier Wellness Fund ($)</label>
+          <p class="text-[10px] text-stone-500 italic mb-3">Cigna, BCBS &amp; United clients typically have $10k–$75k unspent annually. Enter 0 if unknown.</p>
+          <input type="number" id="inp-wellness-fund" class="calc-input" value="0" min="0" max="500000" placeholder="e.g. 25000">
+          <div id="lbl-wellness-coverage" class="mt-3 text-[10px] font-bold text-brand-teal hidden"></div>
+        </div>
       </div>
 
       <!-- Card 2: Operational Metrics -->
@@ -798,7 +804,8 @@ function runCalculator(){
   const employees    = Math.max(1, parseInt(document.getElementById('inp-employees').value) || 250);
   const avgSalary    = Math.max(1, parseInt(document.getElementById('inp-salary').value) || 65000);
   const healthPrem   = Math.max(1, parseInt(document.getElementById('inp-healthpremium').value) || 15000);
-  const stressRate   = parseInt(document.getElementById('inp-stress').value) / 100;
+  const stressRate    = parseInt(document.getElementById('inp-stress').value) / 100;
+  const wellnessFund  = Math.max(0, parseInt(document.getElementById('inp-wellness-fund').value) || 0);
   const turnoverRate = parseInt(document.getElementById('inp-turnover').value) / 100;
   const absDays      = parseFloat(document.getElementById('inp-absent').value);
   const eapPct       = parseInt(document.getElementById('inp-eap').value);
@@ -809,6 +816,20 @@ function runCalculator(){
   const { total: investment } = updateStageDisplay(stage, employees);
   // pf = participation rate × stage effectiveness (both must be high for full ROI)
   const pf = participRate * stage.engagement;
+
+  // Wellness fund coverage display
+  const coverageEl = document.getElementById('lbl-wellness-coverage');
+  if(wellnessFund > 0){
+    const stageInv = calcInvestment(STAGES[parseInt(document.getElementById('inp-stage').value)-1], employees).total;
+    const outOfPocket = Math.max(0, stageInv - wellnessFund);
+    coverageEl.classList.remove('hidden');
+    coverageEl.textContent = outOfPocket === 0
+      ? '✓ Fully fundable — wellness dollars cover the full program cost'
+      : '→ Est. out-of-pocket after wellness fund: $' + Math.round(outOfPocket).toLocaleString();
+    coverageEl.className = 'mt-3 text-[10px] font-bold ' + (outOfPocket === 0 ? 'text-brand-teal' : 'text-plum') + ' block';
+  } else {
+    coverageEl.classList.add('hidden');
+  }
 
   document.getElementById('lbl-stress').textContent       = Math.round(stressRate * 100) + '%';
   document.getElementById('lbl-participation').textContent = Math.round(participRate * 100) + '%';
@@ -908,7 +929,7 @@ function runCalculator(){
   const netROI     = ((total3yr - investment * 3) / (investment * 3)) * 100;
   const paybackMo  = Math.max(1, Math.round(investment / (annualSavings / 12)));
 
-  calcData = { employees, avgSalary, healthPrem, stressRate, participRate, stageEffectiveness: stage.engagement, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
+  calcData = { employees, avgSalary, healthPrem, stressRate, wellnessFund, participRate, stageEffectiveness: stage.engagement, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
 
   const maxCat = Math.max(medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, 1);
   const bp = v => Math.round((v / maxCat) * 100) + '%';
@@ -979,7 +1000,7 @@ function submitData(pdfBase64){
   const payload = {
     firstName:b.firstName,lastName:b.lastName,email:b.email,
     company:b.company,phone:b.phone||'',
-    employees:d.employees,avgSalary:d.avgSalary,healthPremium:d.healthPrem,
+    employees:d.employees,avgSalary:d.avgSalary,healthPremium:d.healthPrem,wellnessFund:d.wellnessFund||0,
     stressRate:Math.round(d.stressRate*100),participRate:Math.round(d.participRate*100),
     turnoverRate:Math.round(d.turnoverRate*100),absDays:d.absDays,
     eapPct:d.eapPct,investment:d.investment,
@@ -1205,24 +1226,6 @@ function buildPDFDoc(){
   kpiBox(M+kpiW*2+8,y, kpiW, 24, 'PAYBACK PERIOD', d.paybackMo+' months', [74,32,64]);
   y+=30;
 
-  // Full engagement disclaimer
-  doc.setFillColor(248,244,252);
-  doc.setDrawColor(200,185,210);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(M,y,CW,14,2,2,'FD');
-  doc.setFillColor(74,32,64);
-  doc.rect(M,y,3,14,'F');
-  doc.setTextColor(74,32,64);
-  doc.setFontSize(7);
-  doc.setFont('helvetica','bold');
-  doc.text('FULL ENGAGEMENT MODEL:',M+6,y+5.5);
-  doc.setFont('helvetica','normal');
-  doc.setTextColor(70,65,62);
-  const discText='These projections reflect a complete SkillfulMeans engagement. Entry point: a single workshop at $1,500 — fully fundable through carrier wellness dollars.';
-  const discLines=doc.splitTextToSize(discText,CW-40);
-  doc.text(discLines,M+6,y+10);
-  y+=20;
-
   // Annual savings headline
   doc.setTextColor(30,25,22);
   doc.setFontSize(10);
@@ -1373,60 +1376,76 @@ function buildPDFDoc(){
   doc.text(methLines,M+4,y+7);
   y+=methH+12;
 
-  // Next steps section
-  y=sectionLabel('Recommended Engagement Pathway', y);
+  // Stage-specific CTA section
+  const stageName = d.stage ? 'Stage '+d.stage.num+' — '+d.stage.name : 'your selected program';
+  const svcShort = [];
+  if(d.stage){
+    if(d.stage.workshops) svcShort.push(d.stage.workshops+' workshop'+(d.stage.workshops>1?'s':''));
+    if(d.stage.challenges) svcShort.push(d.stage.challenges+' 14-day challenge'+(d.stage.challenges>1?'s':''));
+    if(d.stage.leq) svcShort.push('Leadership EQ series');
+    if(d.stage.groupCoaching) svcShort.push('group coaching');
+    if(d.stage.indivCoaching) svcShort.push('individual coaching');
+    if(d.stage.consultant) svcShort.push('wellness consultant');
+    svcShort.push('wellness boxes');
+  }
+  const svcSummary = svcShort.join(', ');
+
+  y=sectionLabel('Your Next Step', y);
+
+  // Context line
   doc.setTextColor(55,50,48);
-  doc.setFontSize(8);
+  doc.setFontSize(8.5);
   doc.setFont('helvetica','normal');
-  const introText='Start with a single 1-hour Interactive Wellness Workshop at $1,500 — fully fundable through carrier wellness dollars. Every workshop includes a paired 14-day team challenge, recorded materials, and a branded employee workbook.';
-  const introLines=doc.splitTextToSize(introText,CW);
-  doc.text(introLines,M,y);
-  y+=introLines.length*4.8+8;
+  const ctaIntro='Based on your workforce profile, '+stageName+' is the recommended starting point. This program includes '+svcSummary+' — and is designed to be fully or partially funded through your client's existing carrier wellness dollars.';
+  const ctaIntroLines=doc.splitTextToSize(ctaIntro,CW);
+  doc.text(ctaIntroLines,M,y);
+  y+=ctaIntroLines.length*4.8+8;
 
-  const steps=[
-    ['1. Single Workshop ($1,500)','Experience quality firsthand — low risk, high signal. Fully fundable through wellness dollars.'],
-    ['2. 14-Day Team Challenge','Embed workshop skills into daily habits. Gamified, coach-facilitated, measurable.'],
-    ['3. Workshop Series','Build a comprehensive mental fitness foundation across multiple team competencies.'],
-    ['4. Leadership EQ Program','Drive culture change from the top. Includes 360 assessment and ROI report.'],
-    ['5. Wellness Boxes + Classes','Sustain engagement and signal that wellbeing is a strategic priority.'],
-    ['6. Annual ROI Report','Demonstrate measurable financial impact to the CFO and renew with confidence.'],
-  ];
-
-  steps.forEach(([title, desc])=>{
-    doc.setFillColor(252,250,248);
-    doc.roundedRect(M,y,CW,14,2,2,'F');
+  // Investment vs wellness fund callout
+  if(d.wellnessFund && d.wellnessFund > 0){
+    const outOfPocket = Math.max(0, d.investment - d.wellnessFund);
+    doc.setFillColor(240,248,245);
+    doc.setDrawColor(180,220,210);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M,y,CW,18,3,3,'FD');
     doc.setFillColor(15,118,110);
-    doc.rect(M,y,3,14,'F');
+    doc.rect(M,y,3,18,'F');
+    doc.setTextColor(15,118,110);
+    doc.setFontSize(7);
+    doc.setFont('helvetica','bold');
+    doc.text('WELLNESS FUND COVERAGE',M+6,y+6);
     doc.setTextColor(30,25,22);
     doc.setFontSize(8);
-    doc.setFont('helvetica','bold');
-    doc.text(title,M+7,y+5.5);
+    doc.text('Annual investment: $'+fmt(d.investment)+'   |   Available wellness fund: $'+fmt(d.wellnessFund)+'   |   Estimated out-of-pocket: $'+fmt(outOfPocket),M+6,y+12);
     doc.setTextColor(80,75,72);
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setFont('helvetica','normal');
-    doc.text(desc,M+7,y+10.5);
-    y+=16;
-  });
+    doc.text(outOfPocket===0?'This program can be fully funded through carrier wellness dollars at zero net cost.':'Wellness dollars cover a significant portion — net cost to your client is $'+fmt(outOfPocket)+'.',M+6,y+16);
+    y+=24;
+  }
 
-  y+=6;
-  // CTA box
+  y+=4;
+  // Big CTA box — matches email style
   doc.setFillColor(74,32,64);
-  doc.roundedRect(M,y,CW,28,4,4,'F');
+  doc.roundedRect(M,y,CW,38,4,4,'F');
   doc.setFillColor(15,118,110);
-  doc.roundedRect(M,y+22,CW,6,0,0,'F');
-  doc.roundedRect(M,y+22,CW,8,4,4,'F');
+  // teal bottom strip
+  doc.roundedRect(M,y+30,CW,8,4,4,'F');
+  doc.rect(M,y+30,CW,4,'F'); // flatten top of strip
   doc.setTextColor(255,255,255);
-  doc.setFontSize(13);
+  doc.setFontSize(14);
   doc.setFont('helvetica','bold');
-  doc.text('Ready to present this to your client?',W/2,y+10,{align:'center'});
-  doc.setFontSize(8);
+  doc.text("Let's get "+b.company+" started.",W/2,y+12,{align:'center'});
+  doc.setFontSize(8.5);
   doc.setFont('helvetica','normal');
   doc.setTextColor(210,230,225);
-  doc.text('Book a 15-minute strategy call — no commitment required',W/2,y+18,{align:'center'});
+  const ctaDesc='Book a 15-minute strategy call with SkillfulMeans to walk through the program, confirm funding, and schedule your first session.';
+  const ctaDescLines=doc.splitTextToSize(ctaDesc,CW-20);
+  doc.text(ctaDescLines,W/2,y+20,{align:'center'});
   doc.setTextColor(255,255,255);
-  doc.setFontSize(7.5);
+  doc.setFontSize(8);
   doc.setFont('helvetica','bold');
-  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,y+26,{align:'center'});
+  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,y+34,{align:'center'});
 
   // Add footers to all pages
   const totalPages=doc.internal.getNumberOfPages();
@@ -1470,7 +1489,7 @@ function initApp(){
   if(typeof Chart==='undefined'){setTimeout(initApp,100);return;}
   Chart.defaults.font.family="'Inter',sans-serif";
   initWCChart(); initROIChart(); initScrollProgress();
-  ['inp-employees','inp-salary','inp-healthpremium'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',runCalculator);el.addEventListener('change',runCalculator);}});
+  ['inp-employees','inp-salary','inp-healthpremium','inp-wellness-fund'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',runCalculator);el.addEventListener('change',runCalculator);}});
   ['inp-stress','inp-participation','inp-stage','inp-turnover','inp-absent','inp-eap'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
   runCalculator();
 }
