@@ -360,7 +360,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Voluntary Turnover Reduction</span></div><span class="font-black text-rose-600 text-sm">$<span id="cat-turnover">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-rose-400 cat-bar" id="bar-turnover" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">SHRM (2022) + Gallup (2023)</p></div>
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-stone-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Workers' Comp BH Comorbidity</span></div><span class="font-black text-stone-600 text-sm">$<span id="cat-wc">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-stone-400 cat-bar" id="bar-wc" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">NCCI + WorkCare Behavioral Health Report</p></div>
           </div>
-          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-xs font-black uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div><div class="mt-4 bg-plum/5 border border-plum/15 rounded-2xl p-4"><p class="text-[10px] font-black uppercase tracking-widest text-plum mb-1">Full Engagement Model</p><p class="text-[10px] text-stone-500 leading-relaxed">These figures reflect a complete SkillfulMeans engagement including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Want to experience quality first? A single workshop starts at <strong class="text-plum">$1,500</strong> — fundable through carrier wellness dollars.</p></div>
+          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-xs font-black uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div><div class="mt-4 bg-plum/5 border border-plum/15 rounded-2xl p-4"><p class="text-[10px] font-black uppercase tracking-widest text-plum mb-1">Full Engagement Model</p><p class="text-[10px] text-stone-500 leading-relaxed">These figures reflect a complete SkillfulMeans engagement. Stages 7–10 apply a <strong class="text-plum">leadership cascade multiplier</strong> — coached leaders influence their entire teams, generating savings beyond direct program participants. Sources: ICF (2020); Harter/Gallup (2020).</p></div>
         </div>
         <!-- EAP vs SM -->
         <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-6">
@@ -818,8 +818,17 @@ function runCalculator(){
 
   const stage = STAGES[stageIdx];
   const { total: investment } = updateStageDisplay(stage, employees);
-  // pf = participation rate × stage effectiveness (both must be high for full ROI)
-  const pf = participRate * stage.engagement;
+  // Base: participation rate × stage effectiveness
+  let pf = participRate * stage.engagement;
+  // Leadership cascade multiplier — coaching stages reach beyond direct participants
+  // Group coaching: 16% of leaders influence ~100% of their teams (Harter/Gallup: manager
+  // quality explains 70% of team engagement variance). Conservative cascade: ×1.30
+  // Individual coaching: executive 1:1 coaching has broadest org impact (ICF 2020: 7:1 ROI).
+  // Conservative cascade: ×1.25 additional
+  // Sources: Harter et al. Gallup (2020); ICF Global Coaching Study (2020); Goleman (1998)
+  if(stage.groupCoaching)  pf = pf * 1.30;
+  if(stage.indivCoaching)  pf = pf * 1.25;
+  pf = Math.min(pf, 1.0); // absolute cap: cannot exceed 100% of workforce
 
   // Wellness fund coverage display
   const coverageEl = document.getElementById('lbl-wellness-coverage');
@@ -1334,17 +1343,17 @@ function buildPDFDoc(){
 
   const exps=[
     {t:'1. Medical Claims Reduction — $'+fmt(d.medSavings)+'/year',
-     b:'Mental and emotional distress drives 50–70% of all primary care visits. The MGH MBSR study (Friedman et al., 2012) demonstrated a 43% reduction in total healthcare utilization within 12 months of a mindfulness program. Harvard\'s Baicker meta-analysis (2010) found $3.27 in medical savings per $1 invested. The IMPACT trial (Unutzer et al., JAMA 2002) found integrated behavioral health reduced total medical costs by $3,363 per patient over 4 years. Stress triggers elevated cortisol, impaired immunity, cardiovascular strain, and GI disorders — all generating costly downstream medical events.',
+     b:'Mental distress drives 50-70% of all primary care visits. The Harvard Baicker meta-analysis (2010) found $3.27 in medical savings per $1 invested in wellness. The MGH MBSR study demonstrated a 43% reduction in healthcare utilization within 12 months. The IMPACT trial (Unutzer, JAMA 2002) showed integrated behavioral health reduced total medical costs by $3,363 per patient over 4 years.',
      cite:'Baicker, Cutler & Song, Health Affairs (2010); Friedman et al., J Altern Complement Med (2012); Unutzer et al., JAMA (2002); Goetzel et al., JOEM (2016)'},
     {t:'2. Absenteeism Reduction — $'+fmt(d.absSavings)+'/year',
-     b:'Hassard et al. (Work & Stress, 2018) found stress-related claims result in 3x longer absences than physical injury claims. NIOSH data establishes that 40% of all unplanned absence is stress-attributed. Hemp (Harvard Business Review, 2004) estimated mental-health-driven absence costs $603 per worker per year. SkillfulMeans\' 14-day challenges and weekly classes build the behavioral infrastructure that reduces stress-driven absence by approximately 28%, consistent with CBT-based workplace intervention research.',
-     cite:'Hassard et al., Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Report'},
+     b:'Hassard et al. (2018) found stress-related absences last 3x longer than physical injury claims. NIOSH data shows 40% of all unplanned absence is stress-attributed. Hemp (HBR, 2004) estimated stress-driven absence costs $603 per worker per year. SkillfulMeans 14-day challenges build the daily behavioral infrastructure that reduces this by approximately 28%.',
+     cite:'Hassard et al., Work & Stress (2018); Hemp, Harvard Business Review (2004); NIOSH Occupational Stress Report'},
     {t:'3. Presenteeism Recovery — $'+fmt(d.pressSavings)+'/year',
-     b:'Presenteeism — working while cognitively impaired — costs 2–3x more than absenteeism yet rarely appears on a balance sheet. Kessler et al. (JAMA, 2006) estimated stressed employees lose ~27 productive days per year (~7.5% of salary). The Aetna MBSR program (2015) found a 28% stress reduction with direct productivity gains. Loeppke et al. (JOEM, 2009) found mental health programs reduce presenteeism by 17–25%. Wang et al. (JOEM, 2007) found a 6:1 ROI for mental health programs overall.',
-     cite:'Kessler et al., JAMA (2006); Aetna Mind Health (2015); Loeppke et al., JOEM (2009); Wang et al., JOEM (2007); WHO (2022)'},
+     b:'Presenteeism costs 2-3x more than absenteeism yet rarely appears on balance sheets. Kessler et al. (JAMA, 2006) estimated stressed employees lose ~27 productive days per year (~7.5% of salary). Aetna MBSR (2015) demonstrated 28% stress reduction with direct productivity gains. Loeppke et al. (JOEM, 2009) confirmed mental health programs reduce presenteeism 17-25%.',
+     cite:'Kessler et al., JAMA (2006); Aetna Mind Health (2015); Loeppke et al., JOEM (2009); Wang et al., JOEM (2007)'},
     {t:'4. Voluntary Turnover Reduction — $'+fmt(d.turnoverSavings)+'/year',
-     b:'SHRM (2022) puts replacement cost at 75% of annual salary. Gallup (2023) finds highly engaged teams show 43% lower voluntary turnover over time. Harter et al.\'s meta-analysis across 276 organizations links psychological safety and EQ — the core competencies SkillfulMeans builds — directly to engagement. Lyubomirsky et al. (Psychological Bulletin, 2005) confirmed positive affect from mindfulness predicts job satisfaction and retention. This model caps the improvement at 12% — a conservative program-level estimate for 1–3 year timeframes.',
-     cite:'SHRM Benchmarking (2022); Gallup (2023); Harter et al. (2020); Lyubomirsky et al., Psych Bulletin (2005)'},
+     b:'SHRM (2022) establishes replacement cost at 75% of annual salary. Gallup (2023) shows highly engaged teams have 43% lower voluntary turnover. Harter et al. meta-analysis across 276 organizations links psychological safety and EQ — core SkillfulMeans competencies — directly to retention. A conservative 12% improvement cap is applied for a 1-3 year program timeframe.',
+     cite:'SHRM (2022); Gallup State of the Workplace (2023); Harter et al., Gallup Meta-Analysis (2020)'},
   ];
 
   const SAFE_Y=H-22;
@@ -1359,7 +1368,7 @@ function buildPDFDoc(){
   // Driver 5
   const exp5={
     t:"5. Workers' Comp BH Comorbidity — $"+fmt(d.wcSavings)+'/year',
-    b:"NCCI (2021) demonstrates that WC claims with behavioral health comorbidities cost 2–4x more and last 3x longer. WorkCare's Behavioral Health Cost Analysis estimates 25% of all WC claims carry a significant BH component. Early mental fitness intervention within 90 days reduces claim duration by 60–70%. Strosahl (2004) found integrated behavioral health reduces primary care and ER utilization by 20–30%. This driver often surprises CFOs most — and directly reduces stop-loss exposure for self-funded plans. A conservative 12% improvement cap is applied, scaled by combined participation and program effectiveness.",
+    b:"NCCI (2021) shows WC claims with behavioral health comorbidities cost 2-4x more and last 3x longer. WorkCare data estimates 25% of all WC claims carry a BH component. Early mental fitness intervention within 90 days reduces claim duration by 60-70% — directly lowering stop-loss exposure for self-funded plans. This driver consistently generates the most compelling ROI conversation with CFOs.",
     cite:"NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)"
   };
   y=textBlock(exp5.t,exp5.b,exp5.cite,y,H-22);
@@ -1427,28 +1436,40 @@ function buildPDFDoc(){
     y+=24;
   }
 
-  y+=4;
-  // Big CTA box — matches email style
-  doc.setFillColor(74,32,64);
-  doc.roundedRect(M,y,CW,38,4,4,'F');
-  doc.setFillColor(15,118,110);
-  // teal bottom strip
-  doc.roundedRect(M,y+30,CW,8,4,4,'F');
-  doc.rect(M,y+30,CW,4,'F'); // flatten top of strip
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(14);
-  doc.setFont('helvetica','bold');
-  doc.text("Let's get "+b.company+" started.",W/2,y+12,{align:'center'});
-  doc.setFontSize(8.5);
+  y+=6;
+  // CTA — matches email button style exactly
+  // White label above
+  doc.setTextColor(80,75,72);
+  doc.setFontSize(9);
   doc.setFont('helvetica','normal');
-  doc.setTextColor(210,230,225);
-  const ctaDesc='Book a 15-minute strategy call with SkillfulMeans to walk through the program, confirm funding, and schedule your first session.';
-  const ctaDescLines=doc.splitTextToSize(ctaDesc,CW-20);
-  doc.text(ctaDescLines,W/2,y+20,{align:'center'});
+  const readyText = 'Your analysis is ready. The next step is a 15-minute call to walk through '+stageName+', confirm wellness fund coverage, and schedule your first session.';
+  const readyLines = doc.splitTextToSize(readyText, CW);
+  doc.text(readyLines, M, y);
+  y += readyLines.length * 5 + 8;
+
+  // Big plum pill button — exactly like email
+  const btnW = CW * 0.75;
+  const btnX = M + (CW - btnW) / 2;
+  doc.setFillColor(74,32,64);
+  doc.roundedRect(btnX, y, btnW, 18, 9, 9, 'F');
   doc.setTextColor(255,255,255);
-  doc.setFontSize(8);
+  doc.setFontSize(12);
   doc.setFont('helvetica','bold');
-  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,y+34,{align:'center'});
+  doc.text('Book a 15-Min Strategy Call →', W/2, y+11, {align:'center'});
+  y += 24;
+
+  // URL below button
+  doc.setTextColor(15,118,110);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica','normal');
+  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2', W/2, y, {align:'center'});
+  y += 5;
+
+  // Footer note
+  doc.setTextColor(150,145,140);
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica','italic');
+  doc.text('No commitment required · Free 15-minute conversation · www.skillfulmeans.life', W/2, y+4, {align:'center'});
 
   // Add footers to all pages
   const totalPages=doc.internal.getNumberOfPages();
