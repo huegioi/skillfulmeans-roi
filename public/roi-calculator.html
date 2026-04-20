@@ -661,7 +661,18 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 <section id="partner" class="max-w-5xl mx-auto px-4 py-24 scroll-mt-24 space-y-12 border-t border-stone-200">
   <div class="text-center max-w-2xl mx-auto"><h2 class="text-4xl font-extrabold text-stone-900 uppercase tracking-tighter">Partner With SkillfulMeans</h2><p class="text-stone-500 text-sm mt-4 italic text-xl">Bring clinical-grade Mental Fitness to your clients — and differentiate your book.</p></div>
   <div class="bg-white p-8 md:p-12 rounded-[3rem] border border-stone-200 shadow-xl flex flex-col md:flex-row gap-12 items-center">
-    <div class="w-full md:w-1/2 flex justify-center"><img src="brochure.jpg" alt="SkillfulMeans Brochure" class="rounded-[2rem] shadow-2xl max-w-full h-auto border border-stone-100 hover:scale-105 transition-transform duration-300"></div>
+    <div class="w-full md:w-1/2 flex justify-center">
+      <a href="https://www.canva.com/design/DAHAYKBCwwg/tQAjggD0c4_HuTjVAGfxcQ/view" target="_blank" class="block w-full max-w-xs hover:scale-105 transition-transform duration-300">
+        <div class="rounded-[2rem] shadow-2xl border border-stone-100 bg-plum overflow-hidden aspect-[3/4] flex flex-col items-center justify-center text-white p-10 gap-6">
+          <div class="text-5xl">📋</div>
+          <div class="text-center">
+            <p class="font-black text-xl tracking-tight">skillfulmeans</p>
+            <p class="text-stone-300 text-sm mt-2 font-medium">Corporate Wellness Brochure</p>
+          </div>
+          <div class="bg-white/15 rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest">Click to View →</div>
+        </div>
+      </a>
+    </div>
     <div class="w-full md:w-1/2 space-y-8">
       <div class="space-y-4"><h3 class="text-3xl font-bold text-plum">Download Our Broker Toolkit</h3><p class="text-stone-600 leading-relaxed text-lg font-medium">Everything you need to present SkillfulMeans to a client: workshop menu, challenge formats, wellness box options, and the leadership EQ program.</p></div>
       <div class="flex flex-col space-y-4">
@@ -1396,7 +1407,7 @@ function buildPDFDoc(){
   doc.setTextColor(55,50,48);
   doc.setFontSize(8.5);
   doc.setFont('helvetica','normal');
-  const ctaIntro='Based on your workforce profile, '+stageName+' is the recommended starting point. This program includes '+svcSummary+' — and is designed to be fully or partially funded through your client's existing carrier wellness dollars.';
+  const ctaIntro='Based on your workforce profile, '+stageName+' is the recommended starting point. This program includes '+svcSummary+' — and is designed to be fully or partially funded through your client\'s existing carrier wellness dollars.';
   const ctaIntroLines=doc.splitTextToSize(ctaIntro,CW);
   doc.text(ctaIntroLines,M,y);
   y+=ctaIntroLines.length*4.8+8;
