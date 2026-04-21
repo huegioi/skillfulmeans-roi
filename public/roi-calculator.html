@@ -1106,431 +1106,501 @@ function buildPDFDoc(){
   const W=doc.internal.pageSize.getWidth();
   const H=doc.internal.pageSize.getHeight();
   const d=calcData, b=brokerInfo;
-  const M=12; // left/right margin
-  const CW=W-M*2; // content width
+  const M=14; // left/right margin
+  const CW=W-M*2;
   const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
-  // ── HELPERS ─────────────────────────────────────────────────────
+  // ── TYPOGRAPHY SYSTEM ──────────────────────────────────────────
+  // H1: 22pt bold  — page titles
+  // H2: 16pt bold  — section headings, KPI values
+  // H3: 12pt bold  — KPI labels, field labels
+  // P:  12pt normal — body text, citations
+
+  const H1=22, H2=16, H3=12, P=12;
+  const LH1=9, LH2=7, LH3=5.5, LP=6; // line heights in mm
+
+  // ── COLORS ────────────────────────────────────────────────────
+  const PLUM=[74,32,64], TEAL=[15,118,110], WHITE=[255,255,255];
+  const DARK=[30,25,22], MID=[80,75,72], LIGHT=[140,135,130];
+  const BGLIGHT=[248,247,244], BGMED=[240,235,245], BGTEAL=[235,248,245];
+
+  // ── LOGO (base64) ─────────────────────────────────────────────
+  const LOGO_B64 =  + logo_b64 + r;
+
+  // ── HELPERS ───────────────────────────────────────────────────
+  function setH1(color=PLUM){ doc.setFontSize(H1); doc.setFont('helvetica','bold'); doc.setTextColor(...color); }
+  function setH2(color=DARK){ doc.setFontSize(H2); doc.setFont('helvetica','bold'); doc.setTextColor(...color); }
+  function setH3(color=DARK){ doc.setFontSize(H3); doc.setFont('helvetica','bold'); doc.setTextColor(...color); }
+  function setP(color=MID){   doc.setFontSize(P);  doc.setFont('helvetica','normal'); doc.setTextColor(...color); }
+  function setPI(color=LIGHT){ doc.setFontSize(P); doc.setFont('helvetica','italic'); doc.setTextColor(...color); }
+
   function footer(pg,tot){
-    doc.setFillColor(245,243,240);
-    doc.rect(0,H-12,W,12,'F');
-    doc.setDrawColor(220,215,210);
-    doc.line(0,H-12,W,H-12);
-    doc.setTextColor(170,160,155);
-    doc.setFontSize(6.5);
-    doc.setFont('helvetica','normal');
-    doc.text('skillfulmeans.life  |  Confidential — prepared for broker use only',M,H-4);
-    doc.text('Page '+pg+' of '+tot,W-M,H-4,{align:'right'});
-  }
-
-  function pageHeader(title, subtitle){
-    // Plum gradient bar
-    doc.setFillColor(74,32,64);
-    doc.rect(0,0,W,36,'F');
-    // Teal accent strip
-    doc.setFillColor(15,118,110);
-    doc.rect(0,34,W,3,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(14);
-    doc.setFont('helvetica','bold');
-    doc.text(title,M,16);
-    if(subtitle){
-      doc.setFontSize(8);
-      doc.setFont('helvetica','normal');
-      doc.setTextColor(220,200,220);
-      doc.text(subtitle,M,26);
-    }
-    return 46; // return y position after header
-  }
-
-  function sectionLabel(text, y){
-    doc.setTextColor(74,32,64);
-    doc.setFontSize(7);
-    doc.setFont('helvetica','bold');
-    doc.text(text.toUpperCase(),M,y);
-    doc.setDrawColor(74,32,64);
-    doc.setLineWidth(0.3);
-    doc.line(M+doc.getTextWidth(text.toUpperCase())+3, y-0.5, W-M, y-0.5);
+    doc.setFillColor(...BGLIGHT);
+    doc.rect(0,H-10,W,10,'F');
+    doc.setDrawColor(210,205,200);
     doc.setLineWidth(0.2);
-    return y+6;
-  }
-
-  function kpiBox(x, y, w, h, label, value, bgColor){
-    doc.setFillColor(...bgColor);
-    doc.roundedRect(x,y,w,h,3,3,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(6.5);
-    doc.setFont('helvetica','bold');
-    doc.text(label,x+w/2,y+7,{align:'center'});
-    doc.setFontSize(bgColor[0]===15?14:13);
-    doc.setFont('helvetica','bold');
-    doc.text(value,x+w/2,y+h-7,{align:'center'});
-  }
-
-  function driverRow(name, value, source, y, shade){
-    const rh=16;
-    doc.setFillColor(shade?249:255, shade?247:255, shade?244:255);
-    doc.rect(M,y,CW,rh,'F');
-    doc.setFillColor(74,32,64);
-    doc.rect(M,y,3,rh,'F');
-    // Name
-    doc.setTextColor(30,30,30);
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica','bold');
-    doc.text(name,M+6,y+6);
-    // Source
-    doc.setTextColor(140,130,125);
-    doc.setFontSize(6);
-    doc.setFont('helvetica','normal');
-    const srcLines=doc.splitTextToSize(source, CW-50);
-    doc.text(srcLines,M+6,y+11);
-    // Value
-    doc.setTextColor(74,32,64);
-    doc.setFontSize(10);
-    doc.setFont('helvetica','bold');
-    doc.text('$'+fmt(value),W-M,y+7,{align:'right'});
-    return y+rh+1;
-  }
-
-  function textBlock(title, body, cite, y, maxY){
-    const tLines=doc.splitTextToSize(title,CW);
-    const bodyLines=doc.splitTextToSize(body,CW);
-    const citeLines=doc.splitTextToSize('Sources: '+cite,CW);
-    // Accurate space estimate including title, body, cite, divider+padding
-    const needed = tLines.length*5 + 4 + bodyLines.length*4.8 + 4 + citeLines.length*4 + 14;
-    if(y+needed > maxY){
-      doc.addPage();
-      y=pageHeader('Understanding Your Results (continued)','');
-    }
-    // Title
-    doc.setTextColor(74,32,64);
+    doc.line(0,H-10,W,H-10);
+    setH3(LIGHT);
     doc.setFontSize(9);
-    doc.setFont('helvetica','bold');
-    doc.text(tLines,M,y);
-    y+=tLines.length*5+4;
-    // Body
-    doc.setTextColor(50,48,46);
-    doc.setFontSize(7.8);
-    doc.setFont('helvetica','normal');
-    doc.text(bodyLines,M,y);
-    y+=bodyLines.length*4.8+4;
-    // Citation
-    doc.setTextColor(150,140,135);
-    doc.setFontSize(6.5);
-    doc.setFont('helvetica','italic');
-    doc.text(citeLines,M,y);
-    y+=citeLines.length*4+5;
-    // Divider
-    doc.setDrawColor(225,220,215);
-    doc.setLineWidth(0.25);
+    doc.text('skillfulmeans.life  |  Confidential — prepared for broker use only',M,H-3.5);
+    doc.text('Page '+pg+' of '+tot,W-M,H-3.5,{align:'right'});
+  }
+
+  function divider(y, color=BGLIGHT){
+    doc.setDrawColor(...color);
+    doc.setLineWidth(0.4);
     doc.line(M,y,W-M,y);
-    y+=9;
-    return y;
+    return y+4;
+  }
+
+  // Wrap text with consistent style — returns new y
+  function writeText(text, x, y, w, lineH){
+    const lines=doc.splitTextToSize(text,w);
+    doc.text(lines,x,y);
+    return y + lines.length*lineH;
   }
 
   // ════════════════════════════════════════════════════════════════
-  // PAGE 1 — Executive Summary
+  // PAGE 1 — EXECUTIVE SUMMARY
   // ════════════════════════════════════════════════════════════════
-  // Header
-  doc.setFillColor(74,32,64);
-  doc.rect(0,0,W,36,'F');
-  doc.setFillColor(15,118,110);
-  doc.rect(0,34,W,3,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(20);
-  doc.setFont('helvetica','bold');
-  doc.text('skillfulmeans',M,16);
-  doc.setFontSize(8);
-  doc.setFont('helvetica','normal');
-  doc.setTextColor(210,190,210);
-  doc.text('Mental Fitness ROI Analysis  |  Confidential Broker Report  |  '+dateStr,M,26);
 
-  // Broker info
-  let y=48;
-  doc.setTextColor(80,75,72);
+  // ── Plum header bar ───────────────────────────────────────────
+  doc.setFillColor(...PLUM);
+  doc.rect(0,0,W,38,'F');
+
+  // Logo image (white on plum)
+  try {
+    doc.addImage('data:image/png;base64,'+LOGO_B64, 'PNG', M, 6, 55, 14);
+  } catch(e) {
+    setH1(WHITE);
+    doc.setFontSize(18);
+    doc.text('skillfulmeans', M, 18);
+  }
+
+  // Confidential line + date — right side of header
+  setH3([210,190,215]);
   doc.setFontSize(9);
-  doc.setFont('helvetica','normal');
-  doc.text('Prepared for:',M,y);
-  doc.setFont('helvetica','bold');
-  doc.setTextColor(30,25,22);
-  doc.text('  '+b.firstName+' '+b.lastName+'  |  '+b.company, M+doc.getTextWidth('Prepared for:'), y);
-  if(b.email){
-    y+=5.5;
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(100,95,92);
-    doc.setFontSize(8);
-    doc.text(b.email+(b.phone?' | '+b.phone:''),M,y);
-  }
+  doc.text('Confidential Broker Report  |  '+dateStr, W-M, 18, {align:'right'});
 
-  // Thin separator
-  y+=6;
-  doc.setDrawColor(210,205,200);
-  doc.setLineWidth(0.3);
-  doc.line(M,y,W-M,y);
-  y+=8;
+  // Green accent bar
+  doc.setFillColor(...TEAL);
+  doc.rect(0,36,W,4,'F');
 
-  // Report title block
-  doc.setTextColor(74,32,64);
-  doc.setFontSize(18);
-  doc.setFont('helvetica','bold');
+  // ── H1: Report Title ──────────────────────────────────────────
+  let y=50;
+  setH1(PLUM);
   doc.text('Mental Fitness ROI Analysis',M,y);
-  y+=7;
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica','normal');
-  doc.setTextColor(100,95,92);
-  doc.text(d.employees.toLocaleString()+' employees  |  $'+d.avgSalary.toLocaleString()+' avg salary  |  $'+d.investment.toLocaleString()+' annual investment',M,y);
-  y+=5;
-  if(d.stage){
-    doc.setTextColor(15,118,110);
-    doc.setFontSize(8);
-    doc.setFont('helvetica','bold');
-    doc.text('Stage '+d.stage.num+' — '+d.stage.name+'  |  '+Math.round(d.stage.engagement*100)+'% program effectiveness  |  '+Math.round(d.participRate*100)+'% participation',M,y);
-  }
-  y+=10;
+  y+=LH1+3;
 
-  // KPI boxes — 3 across
+  // ── Prepared for section ──────────────────────────────────────
+  doc.setFillColor(...BGLIGHT);
+  doc.roundedRect(M,y,CW,22,3,3,'F');
+  doc.setFillColor(...PLUM);
+  doc.rect(M,y,3,22,'F');
+
+  setH3(PLUM);
+  doc.text('PREPARED FOR',M+7,y+6);
+
+  setH2(DARK);
+  doc.text(b.firstName+' '+b.lastName+'  |  '+b.company,M+7,y+13);
+
+  setP(MID);
+  const contactLine=(b.email||'')+(b.phone?' | '+b.phone:'');
+  if(contactLine) doc.text(contactLine,M+7,y+20);
+  y+=28;
+
+  // ── H2: Stage info ────────────────────────────────────────────
+  if(d.stage){
+    doc.setFillColor(...BGTEAL);
+    doc.roundedRect(M,y,CW,16,3,3,'F');
+    doc.setFillColor(...TEAL);
+    doc.rect(M,y,3,16,'F');
+
+    setH3(TEAL);
+    doc.text('SELECTED PROGRAM STAGE',M+7,y+6);
+    setH2(DARK);
+    doc.text('Stage '+d.stage.num+' — '+d.stage.name+'  |  '+Math.round(d.stage.engagement*100)+'% Effectiveness  |  '+Math.round(d.participRate*100)+'% Participation',M+7,y+13);
+    y+=22;
+  }
+
+  // ── 3 KPI boxes ───────────────────────────────────────────────
   const kpiW=(CW-8)/3;
-  kpiBox(M,    y, kpiW, 24, '3-YEAR FINANCIAL IMPACT', '$'+fmt(d.total3yr), [15,118,110]);
-  kpiBox(M+kpiW+4, y, kpiW, 24, 'NET ROI', Math.round(d.netROI)+'%', [74,32,64]);
-  kpiBox(M+kpiW*2+8,y, kpiW, 24, 'PAYBACK PERIOD', d.paybackMo+' months', [74,32,64]);
-  y+=30;
-
-  // Annual savings headline
-  doc.setTextColor(30,25,22);
-  doc.setFontSize(10);
-  doc.setFont('helvetica','bold');
-  doc.text('Projected Annual Savings:',M,y);
-  doc.setTextColor(15,118,110);
-  doc.setFontSize(13);
-  doc.text('  $'+fmt(d.annualSavings), M+doc.getTextWidth('Projected Annual Savings:'), y-1);
-  y+=7;
-
-  // Drivers table
-  y=sectionLabel('Annual Savings by Driver (5-Driver Model  |  9 Peer-Reviewed Sources)',y);
-  const drivers=[
-    {n:'Medical Claims Reduction',   v:d.medSavings,    s:'Baicker et al. (2010); Friedman et al./MGH (2012); Goetzel et al. (2016); Unutzer et al./JAMA (2002)'},
-    {n:'Absenteeism Reduction',      v:d.absSavings,    s:'Baicker et al. (2010); Hassard et al. Work & Stress (2018); Hemp, HBR (2004); NIOSH Occupational Stress Data'},
-    {n:'Presenteeism Recovery',      v:d.pressSavings,  s:'Kessler et al. JAMA (2006); Aetna MBSR (2015); Loeppke et al. JOEM (2009); Wang et al. JOEM (2007); WHO (2022)'},
-    {n:'Voluntary Turnover Reduction',v:d.turnoverSavings,s:'SHRM Benchmarking (2022); Gallup (2023); Harter et al. (2020); Lyubomirsky et al. Psych Bulletin (2005). Max 12% improvement applied.'},
-    {n:"Workers' Comp BH Comorbidity",v:d.wcSavings,   s:'NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)'},
+  const KPIS=[
+    {label:'3-YEAR FINANCIAL IMPACT', value:'$'+fmt(d.total3yr), bg:TEAL},
+    {label:'NET ROI',                 value:Math.round(d.netROI)+'%', bg:PLUM},
+    {label:'PAYBACK PERIOD',          value:d.paybackMo+' months', bg:PLUM},
   ];
-  drivers.forEach((dr,i)=>{ y=driverRow(dr.n,dr.v,dr.s,y,i%2===0); });
-
-  y+=3;
-  // 3-year bar
-  doc.setFillColor(15,118,110);
-  doc.roundedRect(M,y,CW,20,3,3,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(7);
-  doc.setFont('helvetica','bold');
-  doc.text('3-YEAR PROJECTION  (Y1=45% ramp  |  Y2=80%  |  Y3=100% full rate)',M+4,y+7);
-  doc.setFontSize(10);
-  doc.setFont('helvetica','bold');
-  const colW=CW/3;
-  doc.text('Year 1:  $'+fmt(d.y1), M+4, y+15);
-  doc.text('Year 2:  $'+fmt(d.y2), M+colW+4, y+15);
-  doc.text('Year 3:  $'+fmt(d.y3), M+colW*2+4, y+15);
-
-  // ════════════════════════════════════════════════════════════════
-  // PAGE 2 — Services Included + Driver Explanations 1–4
-  // ════════════════════════════════════════════════════════════════
-  doc.addPage();
-  y=pageHeader('Program Details & What Drives Your Results', 'Services included in the selected engagement stage, and the research behind each savings driver');
-
-  // Services included
-  if(d.stage){
-    y=sectionLabel('Services Included in Stage '+d.stage.num+' — '+d.stage.name, y);
-    const svc=[];
-    if(d.stage.workshops) svc.push(d.stage.workshops+' Workshop'+(d.stage.workshops>1?'s':'')+' @ $1,500 each');
-    if(d.stage.challenges) svc.push(d.stage.challenges+' 14-Day Team Challenge'+(d.stage.challenges>1?'s':''));
-    if(d.stage.leq) svc.push('Leadership EQ Series (3-part program + 360 assessment)');
-    if(d.stage.groupCoaching) svc.push('Group Coaching — '+Math.ceil(d.employees*0.16/12)+' cohorts of 12 (16% of workforce)');
-    if(d.stage.indivCoaching) svc.push('Individual Coaching — '+Math.round(d.employees*0.05)+' leaders (5% of staff)');
-    if(d.stage.consultant) svc.push('Dedicated Wellness Consultant + Platform Data Access');
-    const boxLabel=d.stage.incentiveStage===3?'Full Workforce Wellness Boxes ('+d.employees.toLocaleString()+" employees)":d.stage.incentiveStage===2?'Wellness Boxes — per challenge and workshop':'Wellness Boxes — per workshop';
-    svc.push(boxLabel);
-
-    const perCol=Math.ceil(svc.length/2);
-    const boxH=10+(perCol*6);
-    doc.setFillColor(240,248,245);
-    doc.setDrawColor(180,220,210);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(M,y,CW,boxH,3,3,'FD');
-    doc.setFillColor(15,118,110);
-    doc.rect(M,y,3,boxH,'F');
-    svc.forEach((s,i)=>{
-      const col=Math.floor(i/perCol);
-      const row=i%perCol;
-      doc.setTextColor(20,80,60);
-      doc.setFontSize(7.5);
-      doc.setFont('helvetica','normal');
-      doc.text('- '+s, M+6+(col*(CW/2)), y+9+(row*6));
-    });
-    y+=boxH+10;
-
-    // Investment breakdown
-    y=sectionLabel('Investment Breakdown', y);
-    const {breakdown}=calcInvestment(d.stage,d.employees);
-    const brkH=8+(breakdown.length*5.5);
-    doc.setFillColor(252,250,248);
-    doc.roundedRect(M,y,CW,brkH,2,2,'F');
-    breakdown.forEach((item,i)=>{
-      doc.setTextColor(60,55,52);
-      doc.setFontSize(7.5);
-      doc.setFont('helvetica','normal');
-      doc.text(item.label,M+4,y+7+(i*5.5));
-      doc.setFont('helvetica','bold');
-      doc.setTextColor(74,32,64);
-      doc.text('$'+item.cost.toLocaleString(),W-M-2,y+7+(i*5.5),{align:'right'});
-    });
-    // Total line
-    doc.setDrawColor(200,195,190);
-    doc.line(M,y+brkH-6,W-M,y+brkH-6);
+  KPIS.forEach((k,i)=>{
+    const x=M+i*(kpiW+4);
+    doc.setFillColor(...k.bg);
+    doc.roundedRect(x,y,kpiW,28,3,3,'F');
+    // H3 label
+    doc.setTextColor(...WHITE);
+    doc.setFontSize(H3);
     doc.setFont('helvetica','bold');
-    doc.setTextColor(30,25,22);
-    doc.setFontSize(8.5);
-    doc.text('Total Annual Investment',M+4,y+brkH-1);
-    doc.setTextColor(15,118,110);
-    doc.text('$'+d.investment.toLocaleString(),W-M-2,y+brkH-1,{align:'right'});
-    y+=brkH+12;
-  }
+    doc.text(k.label,x+kpiW/2,y+9,{align:'center'});
+    // H2 value
+    doc.setFontSize(H2);
+    doc.text(k.value,x+kpiW/2,y+21,{align:'center'});
+  });
+  y+=34;
 
-  // Driver explanations 1–4
-  y=sectionLabel('Understanding Your Results — Plain Language with Sources', y);
+  // ── Drivers table ─────────────────────────────────────────────
+  setH3(DARK);
+  doc.text('ANNUAL SAVINGS BY DRIVER',M,y);
+  y+=LP+2;
 
-  const exps=[
-    {t:'1. Medical Claims Reduction — $'+fmt(d.medSavings)+'/year',
-     b:'Mental distress drives 50-70% of all primary care visits. The Harvard Baicker meta-analysis (2010) found $3.27 in medical savings per $1 invested in wellness. The MGH MBSR study demonstrated a 43% reduction in healthcare utilization within 12 months. The IMPACT trial (Unutzer, JAMA 2002) showed integrated behavioral health reduced total medical costs by $3,363 per patient over 4 years.',
-     cite:'Baicker, Cutler & Song, Health Affairs (2010); Friedman et al., J Altern Complement Med (2012); Unutzer et al., JAMA (2002); Goetzel et al., JOEM (2016)'},
-    {t:'2. Absenteeism Reduction — $'+fmt(d.absSavings)+'/year',
-     b:'Hassard et al. (2018) found stress-related absences last 3x longer than physical injury claims. NIOSH data shows 40% of all unplanned absence is stress-attributed. Hemp (HBR, 2004) estimated stress-driven absence costs $603 per worker per year. SkillfulMeans 14-day challenges build the daily behavioral infrastructure that reduces this by approximately 28%.',
-     cite:'Hassard et al., Work & Stress (2018); Hemp, Harvard Business Review (2004); NIOSH Occupational Stress Report'},
-    {t:'3. Presenteeism Recovery — $'+fmt(d.pressSavings)+'/year',
-     b:'Presenteeism costs 2-3x more than absenteeism yet rarely appears on balance sheets. Kessler et al. (JAMA, 2006) estimated stressed employees lose ~27 productive days per year (~7.5% of salary). Aetna MBSR (2015) demonstrated 28% stress reduction with direct productivity gains. Loeppke et al. (JOEM, 2009) confirmed mental health programs reduce presenteeism 17-25%.',
-     cite:'Kessler et al., JAMA (2006); Aetna Mind Health (2015); Loeppke et al., JOEM (2009); Wang et al., JOEM (2007)'},
-    {t:'4. Voluntary Turnover Reduction — $'+fmt(d.turnoverSavings)+'/year',
-     b:'SHRM (2022) establishes replacement cost at 75% of annual salary. Gallup (2023) shows highly engaged teams have 43% lower voluntary turnover. Harter et al. meta-analysis across 276 organizations links psychological safety and EQ — core SkillfulMeans competencies — directly to retention. A conservative 12% improvement cap is applied for a 1-3 year program timeframe.',
-     cite:'SHRM (2022); Gallup State of the Workplace (2023); Harter et al., Gallup Meta-Analysis (2020)'},
+  const drivers=[
+    {n:'Medical Claims Reduction',    v:d.medSavings,      s:'Baicker (2010); MGH/Friedman (2012); Goetzel (2016); Unutzer/JAMA (2002)'},
+    {n:'Absenteeism Reduction',       v:d.absSavings,      s:'Baicker (2010); Hassard et al. (2018); Hemp/HBR (2004)'},
+    {n:'Presenteeism Recovery',       v:d.pressSavings,    s:'Kessler/JAMA (2006); Aetna MBSR (2015); Loeppke (2009); WHO (2022)'},
+    {n:'Voluntary Turnover Reduction',v:d.turnoverSavings, s:'SHRM (2022); Gallup (2023); Harter et al. (2020)'},
+    {n:"Workers' Comp BH Comorbidity",v:d.wcSavings,       s:'NCCI (2021); WorkCare (2020)'},
   ];
 
-  const SAFE_Y=H-22;
-  exps.forEach(ex=>{ y=textBlock(ex.t,ex.b,ex.cite,y,SAFE_Y); });
+  drivers.forEach((dr,i)=>{
+    const rh=18;
+    doc.setFillColor(i%2===0?249:255, i%2===0?247:255, i%2===0?244:255);
+    doc.rect(M,y,CW,rh,'F');
+    doc.setFillColor(...PLUM);
+    doc.rect(M,y,3,rh,'F');
 
-  // ════════════════════════════════════════════════════════════════
-  // PAGE 3 — Driver 5 + Next Steps
-  // ════════════════════════════════════════════════════════════════
-  doc.addPage();
-  y=pageHeader("Results Continued + Recommended Next Steps", "Workers' compensation driver explanation and your pathway to getting started");
+    // Driver name — H3
+    setH3(DARK);
+    doc.text(dr.n, M+7, y+6);
+    // Source — P italic small
+    doc.setFontSize(9);
+    doc.setFont('helvetica','italic');
+    doc.setTextColor(...LIGHT);
+    doc.text(dr.s, M+7, y+12);
+    // Value — H2 right aligned
+    setH2(PLUM);
+    doc.text('$'+fmt(dr.v), W-M, y+8, {align:'right'});
 
-  // Driver 5
-  const exp5={
-    t:"5. Workers' Comp BH Comorbidity — $"+fmt(d.wcSavings)+'/year',
-    b:"NCCI (2021) shows WC claims with behavioral health comorbidities cost 2-4x more and last 3x longer. WorkCare data estimates 25% of all WC claims carry a BH component. Early mental fitness intervention within 90 days reduces claim duration by 60-70% — directly lowering stop-loss exposure for self-funded plans. This driver consistently generates the most compelling ROI conversation with CFOs.",
-    cite:"NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)"
-  };
-  y=textBlock(exp5.t,exp5.b,exp5.cite,y,H-22);
+    y+=rh+1;
+  });
   y+=4;
 
-  // Methodology note
-  doc.setFillColor(248,247,244);
-  doc.setDrawColor(210,205,200);
-  doc.setLineWidth(0.25);
-  const methText='Model methodology: All savings scale by (Participation Rate x Stage Effectiveness). Ramp-up applied: Year 1 = 45%, Year 2 = 80%, Year 3 = 100%. Conservative lower-bound estimates from each study used throughout. Projections are evidence-based estimates; actual results vary by organization, industry, and implementation quality. This model does not constitute a guarantee of financial performance or medical outcomes.';
-  const methLines=doc.splitTextToSize(methText,CW-8);
-  const methH=10+methLines.length*4;
-  doc.roundedRect(M,y,CW,methH,2,2,'FD');
-  doc.setTextColor(120,115,112);
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica','italic');
-  doc.text(methLines,M+4,y+7);
-  y+=methH+12;
+  // ── 3-Year projection bar ─────────────────────────────────────
+  doc.setFillColor(...TEAL);
+  doc.roundedRect(M,y,CW,22,3,3,'F');
 
-  // Stage-specific CTA section
-  const stageName = d.stage ? 'Stage '+d.stage.num+' — '+d.stage.name : 'your selected program';
-  const svcShort = [];
+  setH3(WHITE);
+  doc.text('3-YEAR PROJECTION  (Y1=45% ramp | Y2=80% | Y3=100%)', M+6, y+8);
+
+  setH2(WHITE);
+  const c3=CW/3;
+  doc.text('$'+fmt(d.y1), M+6+c3*0,    y+18);
+  doc.text('$'+fmt(d.y2), M+6+c3*1,    y+18);
+  doc.text('$'+fmt(d.y3), M+6+c3*2,    y+18);
+
+  setH3([180,235,230]);
+  doc.text('Year 1', M+6+c3*0, y+13);
+  doc.text('Year 2', M+6+c3*1, y+13);
+  doc.text('Year 3', M+6+c3*2, y+13);
+
+  // ════════════════════════════════════════════════════════════════
+  // PAGE 2 — PROGRAM DETAILS
+  // ════════════════════════════════════════════════════════════════
+  doc.addPage();
+
+  // Header
+  doc.setFillColor(...PLUM);
+  doc.rect(0,0,W,36,'F');
+  try { doc.addImage('data:image/png;base64,'+LOGO_B64,'PNG',M,6,55,14); } catch(e){}
+  doc.setFillColor(...TEAL);
+  doc.rect(0,34,W,4,'F');
+  y=46;
+
+  setH1(PLUM);
+  doc.text('Program Details',M,y);
+  y+=LH1+6;
+
   if(d.stage){
-    if(d.stage.workshops) svcShort.push(d.stage.workshops+' workshop'+(d.stage.workshops>1?'s':''));
-    if(d.stage.challenges) svcShort.push(d.stage.challenges+' 14-day challenge'+(d.stage.challenges>1?'s':''));
-    if(d.stage.leq) svcShort.push('Leadership EQ series');
-    if(d.stage.groupCoaching) svcShort.push('group coaching');
-    if(d.stage.indivCoaching) svcShort.push('individual coaching');
-    if(d.stage.consultant) svcShort.push('wellness consultant');
-    svcShort.push('wellness boxes');
+    // Stage name banner
+    doc.setFillColor(...BGTEAL);
+    doc.roundedRect(M,y,CW,14,3,3,'F');
+    doc.setFillColor(...TEAL);
+    doc.rect(M,y,3,14,'F');
+    setH2(TEAL);
+    doc.text('Stage '+d.stage.num+' — '+d.stage.name,M+7,y+10);
+    y+=20;
+
+    // Intent paragraph
+    setH3(PLUM);
+    doc.text('PROGRAM INTENT',M,y);
+    y+=LP+1;
+    setP(DARK);
+    y=writeText(d.stage.intent,M,y,CW,LP)+5;
+
+    y=divider(y,[220,215,210]);
+
+    // Services included
+    setH3(PLUM);
+    doc.text('SERVICES INCLUDED',M,y);
+    y+=LP+2;
+
+    const svc=[];
+    if(d.stage.workshops) svc.push({title:(d.stage.workshops>1?d.stage.workshops+' Workshops':'1 Workshop'), sub:'$1,500 per workshop — virtual or in-person, includes materials, workbook & recording'});
+    if(d.stage.challenges) svc.push({title:(d.stage.challenges>1?d.stage.challenges+' 14-Day Team Challenges':'1 14-Day Team Challenge'), sub:'Daily videos, team leaderboard, coached discussion board, meditation recordings'});
+    if(d.stage.leq) svc.push({title:'Leadership EQ Series (3-part)', sub:'Sequential workshop series + Leadership Circle Profile 360 assessment + ROI report'});
+    if(d.stage.groupCoaching) svc.push({title:'Group Coaching — '+Math.ceil(d.employees*0.16/12)+' cohorts', sub:'16% of workforce in coached cohorts of 12. $5,000 per cohort.'});
+    if(d.stage.indivCoaching) svc.push({title:'Individual Coaching — '+Math.round(d.employees*0.05)+' leaders', sub:'1:1 coaching for highest-impact leaders (5% of staff). $5,000 per leader.'});
+    if(d.stage.consultant) svc.push({title:'Dedicated Wellness Consultant + Platform Data Access', sub:'Strategic oversight, utilization reporting, and ongoing program optimization. $10,000.'});
+    const boxLabel=d.stage.incentiveStage===3
+      ?'Wellness Boxes — Full Workforce ('+d.employees.toLocaleString()+' employees)'
+      :d.stage.incentiveStage===2?'Wellness Boxes — Per Challenge & Workshop':'Wellness Boxes — Per Workshop';
+    svc.push({title:boxLabel, sub:'Physical or digital boxes at $75/box. Stress Relief, Relaxation & Sleep, Emotional Wellness themes.'});
+
+    svc.forEach((s,i)=>{
+      if(y>H-30){ doc.addPage(); doc.setFillColor(...PLUM); doc.rect(0,0,W,36,'F'); try{doc.addImage('data:image/png;base64,'+LOGO_B64,'PNG',M,6,55,14);}catch(e){} doc.setFillColor(...TEAL); doc.rect(0,34,W,4,'F'); y=46; }
+      doc.setFillColor(i%2===0?248:255, i%2===0?246:255, i%2===0?244:255);
+      doc.roundedRect(M,y,CW,18,2,2,'F');
+      doc.setFillColor(...TEAL);
+      doc.rect(M,y,3,18,'F');
+      setH3(DARK);
+      doc.text(s.title,M+7,y+7);
+      setP(MID);
+      doc.text(s.sub,M+7,y+14);
+      y+=20;
+    });
+
+    y+=4;
+    y=divider(y,[220,215,210]);
+
+    // Investment breakdown
+    setH3(PLUM);
+    doc.text('INVESTMENT BREAKDOWN',M,y);
+    y+=LP+2;
+
+    const {breakdown}=calcInvestment(d.stage,d.employees);
+    breakdown.forEach((item,i)=>{
+      if(y>H-25){ doc.addPage(); y=20; }
+      doc.setFillColor(i%2===0?252:255, i%2===0?250:255, i%2===0?248:255);
+      doc.roundedRect(M,y,CW,12,1,1,'F');
+      setP(DARK);
+      doc.text(item.label,M+5,y+8);
+      setH3(PLUM);
+      doc.text('$'+item.cost.toLocaleString(),W-M-3,y+8,{align:'right'});
+      y+=13;
+    });
+
+    // Total
+    doc.setDrawColor(...TEAL);
+    doc.setLineWidth(0.5);
+    doc.line(M,y,W-M,y);
+    y+=5;
+    setH2(DARK);
+    doc.text('Total Annual Investment',M+5,y);
+    setH2(TEAL);
+    doc.text('$'+d.investment.toLocaleString(),W-M-3,y,{align:'right'});
+    y+=8;
+
+    // Wellness fund coverage
+    if(d.wellnessFund&&d.wellnessFund>0){
+      const oop=Math.max(0,d.investment-d.wellnessFund);
+      doc.setFillColor(...BGTEAL);
+      doc.roundedRect(M,y,CW,16,3,3,'F');
+      doc.setFillColor(...TEAL);
+      doc.rect(M,y,3,16,'F');
+      setH3(TEAL);
+      doc.text('WELLNESS FUND COVERAGE',M+7,y+6);
+      setP(DARK);
+      doc.text('Available fund: $'+fmt(d.wellnessFund)+'   |   Estimated out-of-pocket: $'+fmt(oop)+(oop===0?' — fully funded at zero net cost.':''),M+7,y+13);
+      y+=22;
+    }
   }
-  const svcSummary = svcShort.join(', ');
 
-  y=sectionLabel('Your Next Step', y);
+  // ════════════════════════════════════════════════════════════════
+  // PAGES 3-4 — UNDERSTANDING YOUR RESULTS
+  // ════════════════════════════════════════════════════════════════
+  doc.addPage();
+  doc.setFillColor(...PLUM);
+  doc.rect(0,0,W,36,'F');
+  try{doc.addImage('data:image/png;base64,'+LOGO_B64,'PNG',M,6,55,14);}catch(e){}
+  doc.setFillColor(...TEAL);
+  doc.rect(0,34,W,4,'F');
+  y=46;
 
-  // Context line
-  doc.setTextColor(55,50,48);
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica','normal');
-  const ctaIntro='Based on your workforce profile, '+stageName+' is the recommended starting point. This program includes '+svcSummary+' — and is designed to be fully or partially funded through your client\'s existing carrier wellness dollars.';
-  const ctaIntroLines=doc.splitTextToSize(ctaIntro,CW);
-  doc.text(ctaIntroLines,M,y);
-  y+=ctaIntroLines.length*4.8+8;
+  setH1(PLUM);
+  doc.text('Understanding Your Results',M,y);
+  y+=LH1+4;
 
-  // Investment vs wellness fund callout
-  if(d.wellnessFund && d.wellnessFund > 0){
-    const outOfPocket = Math.max(0, d.investment - d.wellnessFund);
-    doc.setFillColor(240,248,245);
-    doc.setDrawColor(180,220,210);
+  setP(MID);
+  y=writeText('Each of the five savings drivers below is calculated from a blend of peer-reviewed sources. Conservative lower-bound estimates are applied throughout. Actual results vary by organization, industry, and implementation quality.',M,y,CW,LP)+8;
+
+  const exps=[
+    {t:'1. Medical Claims Reduction',
+     v:'$'+fmt(d.medSavings)+'/year',
+     b:'Mental distress drives 50-70% of primary care visits. The Harvard Baicker meta-analysis (2010) found $3.27 in medical savings per $1 invested. The MGH MBSR study (Friedman, 2012) showed a 43% reduction in healthcare utilization within 12 months. The IMPACT trial (Unutzer, JAMA 2002) found integrated behavioral health reduced total medical costs by $3,363 per patient over 4 years. Goetzel et al. (2016) found $2,304 lower annual medical spend per engaged employee.',
+     cite:'Baicker, Cutler & Song, Health Affairs (2010); Friedman et al., J Altern Complement Med (2012); Unutzer et al., JAMA (2002); Goetzel et al., JOEM (2016)'},
+    {t:'2. Absenteeism Reduction',
+     v:'$'+fmt(d.absSavings)+'/year',
+     b:'Hassard et al. (2018) found stress-related absences last 3x longer than physical injury claims. NIOSH data shows 40% of all unplanned absence is stress-attributed. Hemp (HBR, 2004) estimated stress-driven absence costs $603 per worker per year. SkillfulMeans 14-day challenges build the daily behavioral infrastructure that reduces this by approximately 28%.',
+     cite:'Hassard et al., Work & Stress (2018); Hemp, Harvard Business Review (2004); NIOSH Occupational Stress Report'},
+    {t:'3. Presenteeism Recovery',
+     v:'$'+fmt(d.pressSavings)+'/year',
+     b:'Presenteeism costs 2-3x more than absenteeism yet rarely appears on balance sheets. Kessler et al. (JAMA, 2006) estimated stressed employees lose approximately 27 productive days per year — about 7.5% of salary. Aetna MBSR (2015) demonstrated 28% stress reduction with direct productivity gains. Loeppke et al. (JOEM, 2009) confirmed mental health programs reduce presenteeism 17-25%.',
+     cite:'Kessler et al., JAMA (2006); Aetna Mind Health (2015); Loeppke et al., JOEM (2009); Wang et al., JOEM (2007)'},
+    {t:'4. Voluntary Turnover Reduction',
+     v:'$'+fmt(d.turnoverSavings)+'/year',
+     b:'SHRM (2022) establishes replacement cost at 75% of annual salary. Gallup (2023) shows highly engaged teams have 43% lower voluntary turnover. Harter et al. meta-analysis across 276 organizations links psychological safety and EQ — core SkillfulMeans competencies — directly to retention. A conservative 12% improvement cap is applied for a 1-3 year program timeframe.',
+     cite:'SHRM (2022); Gallup State of the Workplace (2023); Harter et al., Gallup Meta-Analysis (2020)'},
+    {t:"5. Workers' Comp BH Comorbidity",
+     v:'$'+fmt(d.wcSavings)+'/year',
+     b:"NCCI (2021) shows WC claims with behavioral health comorbidities cost 2-4x more and last 3x longer. WorkCare data estimates 25% of all WC claims carry a BH component. Early mental fitness intervention within 90 days reduces claim duration by 60-70% — directly lowering stop-loss exposure for self-funded plans.",
+     cite:"NCCI Research Brief (2021); WorkCare Behavioral Health Analysis (2020); Strosahl, Psychiatric Clinics (2004)"},
+  ];
+
+  const SAFE_Y=H-18;
+  exps.forEach((ex,idx)=>{
+    // Estimate space needed
+    const bLines=doc.splitTextToSize(ex.b,CW);
+    const cLines=doc.splitTextToSize('Sources: '+ex.cite,CW);
+    const needed=LH2+LP+bLines.length*LP+cLines.length*(LP-1)+16;
+    if(y+needed>SAFE_Y){
+      doc.addPage();
+      doc.setFillColor(...PLUM); doc.rect(0,0,W,36,'F');
+      try{doc.addImage('data:image/png;base64,'+LOGO_B64,'PNG',M,6,55,14);}catch(e){}
+      doc.setFillColor(...TEAL); doc.rect(0,34,W,4,'F');
+      y=46;
+      setH1(PLUM);
+      doc.text('Understanding Your Results (continued)',M,y);
+      y+=LH1+4;
+    }
+
+    // Driver block background
+    doc.setFillColor(idx%2===0?248:251,idx%2===0?245:248,idx%2===0?252:255);
+    // Title row
+    doc.setFillColor(...BGMED);
+    doc.roundedRect(M,y,CW,13,2,2,'F');
+    doc.setFillColor(...PLUM);
+    doc.rect(M,y,4,13,'F');
+    setH2(PLUM);
+    doc.text(ex.t,M+9,y+9);
+    setH2(TEAL);
+    doc.text(ex.v,W-M,y+9,{align:'right'});
+    y+=15;
+
+    // Body
+    setP(DARK);
+    doc.setFontSize(P);
+    const bl=doc.splitTextToSize(ex.b,CW);
+    doc.text(bl,M,y);
+    y+=bl.length*LP+4;
+
+    // Citation
+    setPI(LIGHT);
+    doc.setFontSize(10);
+    const cl=doc.splitTextToSize('Sources: '+ex.cite,CW);
+    doc.text(cl,M,y);
+    y+=cl.length*(LP-1)+8;
+
+    doc.setDrawColor(220,215,210);
     doc.setLineWidth(0.3);
-    doc.roundedRect(M,y,CW,18,3,3,'FD');
-    doc.setFillColor(15,118,110);
-    doc.rect(M,y,3,18,'F');
-    doc.setTextColor(15,118,110);
-    doc.setFontSize(7);
+    doc.line(M,y,W-M,y);
+    y+=8;
+  });
+
+  // ════════════════════════════════════════════════════════════════
+  // FINAL PAGE — RECOMMENDED NEXT STEPS
+  // ════════════════════════════════════════════════════════════════
+  doc.addPage();
+  doc.setFillColor(...PLUM); doc.rect(0,0,W,36,'F');
+  try{doc.addImage('data:image/png;base64,'+LOGO_B64,'PNG',M,6,55,14);}catch(e){}
+  doc.setFillColor(...TEAL); doc.rect(0,34,W,4,'F');
+  y=46;
+
+  setH1(PLUM);
+  doc.text('Recommended Next Steps',M,y);
+  y+=LH1+3;
+
+  setP(MID);
+  const stageName=d.stage?'Stage '+d.stage.num+' — '+d.stage.name:'your selected program';
+  const introT='Based on this analysis, '+stageName+' is the recommended starting point for '+b.company+'. Every stage is designed to build on the last — delivering compounding returns as each layer of the program takes hold.';
+  y=writeText(introT,M,y,CW,LP)+8;
+
+  // Methodology note
+  doc.setFillColor(...BGLIGHT);
+  doc.roundedRect(M,y,CW,20,3,3,'F');
+  doc.setFillColor(...PLUM);
+  doc.rect(M,y,3,20,'F');
+  setH3(PLUM);
+  doc.text('MODEL METHODOLOGY',M+7,y+7);
+  setP(MID);
+  const methT='Savings scale by (Participation Rate x Stage Effectiveness x Synergy Multipliers). Ramp-up: Y1=45%, Y2=80%, Y3=100%. Conservative lower-bound estimates used throughout. Synergy multipliers reflect cascade effects: challenges x1.20 (habit formation), LEQ x1.10 (leadership climate), group coaching x1.30 (manager-team cascade), individual coaching x1.25 (executive impact).';
+  const mLines=doc.splitTextToSize(methT,CW-12);
+  doc.text(mLines,M+7,y+13);
+  y+=mLines.length*LP+18;
+
+  // Engagement pathway cards
+  setH2(DARK);
+  doc.text('Your Engagement Pathway',M,y);
+  y+=LH2+4;
+
+  const steps=[
+    {num:'01', title:'Start the Conversation', body:'Share this analysis with your client. The numbers speak for themselves — mental fitness is not a perk, it is a claims mitigation strategy with measurable ROI.'},
+    {num:'02', title:'Book a 15-Minute Strategy Call', body:'A brief call with SkillfulMeans to walk through the selected stage, confirm wellness fund coverage, and answer any program questions before presenting to the client.'},
+    {num:'03', title:'Schedule Your First Session', body:'We handle all logistics. You choose a date, we coordinate with the workforce and deliver a world-class experience your client will remember.'},
+    {num:'04', title:'Expand at Your Pace', body:'Every stage is designed to build on the last. Start where it makes sense — then expand as the client sees results and confidence grows.'},
+  ];
+
+  steps.forEach((s,i)=>{
+    if(y>H-35){doc.addPage();y=20;}
+    // Card background
+    doc.setFillColor(i%2===0?245:248, i%2===0?240:245, i%2===0?252:255);
+    doc.roundedRect(M,y,CW,26,3,3,'F');
+    // Number badge
+    doc.setFillColor(...PLUM);
+    doc.roundedRect(M+4,y+5,14,16,2,2,'F');
+    doc.setTextColor(...WHITE);
+    doc.setFontSize(H2);
     doc.setFont('helvetica','bold');
-    doc.text('WELLNESS FUND COVERAGE',M+6,y+6);
-    doc.setTextColor(30,25,22);
-    doc.setFontSize(8);
-    doc.text('Annual investment: $'+fmt(d.investment)+'   |   Available wellness fund: $'+fmt(d.wellnessFund)+'   |   Estimated out-of-pocket: $'+fmt(outOfPocket),M+6,y+12);
-    doc.setTextColor(80,75,72);
-    doc.setFontSize(7);
-    doc.setFont('helvetica','normal');
-    doc.text(outOfPocket===0?'This program can be fully funded through carrier wellness dollars at zero net cost.':'Wellness dollars cover a significant portion — net cost to your client is $'+fmt(outOfPocket)+'.',M+6,y+16);
-    y+=24;
-  }
+    doc.text(s.num,M+11,y+16,{align:'center'});
+    // Title
+    setH2(PLUM);
+    doc.text(s.title,M+24,y+11);
+    // Body
+    setP(DARK);
+    const sl=doc.splitTextToSize(s.body,CW-26);
+    doc.text(sl,M+24,y+18);
+    y+=28;
+  });
 
   y+=6;
-  // CTA — matches email button style exactly
-  // White label above
-  doc.setTextColor(80,75,72);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','normal');
-  const readyText = 'Your analysis is ready. The next step is a 15-minute call to walk through '+stageName+', confirm wellness fund coverage, and schedule your first session.';
-  const readyLines = doc.splitTextToSize(readyText, CW);
-  doc.text(readyLines, M, y);
-  y += readyLines.length * 5 + 8;
+  // CTA box
+  if(y>H-45){doc.addPage();y=20;}
+  doc.setFillColor(...PLUM);
+  doc.roundedRect(M,y,CW,38,5,5,'F');
+  doc.setFillColor(...TEAL);
+  doc.roundedRect(M,y+30,CW,8,5,5,'F');
+  doc.rect(M,y+30,CW,4,'F');
 
-  // Big plum pill button — exactly like email
-  const btnW = CW * 0.75;
-  const btnX = M + (CW - btnW) / 2;
-  doc.setFillColor(74,32,64);
-  doc.roundedRect(btnX, y, btnW, 18, 9, 9, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(12);
-  doc.setFont('helvetica','bold');
-  doc.text('Book a 15-Min Strategy Call →', W/2, y+11, {align:'center'});
-  y += 24;
+  setH1(WHITE);
+  doc.setFontSize(18);
+  doc.text("Let’s get "+b.company+" started.",W/2,y+12,{align:'center'});
 
-  // URL below button
-  doc.setTextColor(15,118,110);
-  doc.setFontSize(7.5);
-  doc.setFont('helvetica','normal');
-  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2', W/2, y, {align:'center'});
-  y += 5;
+  setP([210,240,238]);
+  doc.setFontSize(P);
+  doc.text('Book a free 15-minute strategy call — no commitment required.',W/2,y+22,{align:'center'});
 
-  // Footer note
-  doc.setTextColor(150,145,140);
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica','italic');
-  doc.text('No commitment required · Free 15-minute conversation · www.skillfulmeans.life', W/2, y+4, {align:'center'});
+  // Button pill
+  const btnW=100, btnX=(W-btnW)/2;
+  doc.setFillColor(255,255,255);
+  doc.roundedRect(btnX,y+27,btnW,10,5,5,'F');
+  setH3(PLUM);
+  doc.setFontSize(H3);
+  doc.text('Book a 15-Min Strategy Call →',W/2,y+33.5,{align:'center'});
 
-  // Add footers to all pages
-  const totalPages=doc.internal.getNumberOfPages();
-  for(let i=1;i<=totalPages;i++){doc.setPage(i);footer(i,totalPages);}
+  // URL below
+  y+=44;
+  setP(TEAL);
+  doc.setFontSize(P);
+  doc.text('calendly.com/skillfulmeans/skms-corporate-wellness-offerings-2',W/2,y,{align:'center'});
+
+  // Footers on all pages
+  const total=doc.internal.getNumberOfPages();
+  for(let i=1;i<=total;i++){doc.setPage(i);footer(i,total);}
   return doc;
 }
 
