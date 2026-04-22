@@ -230,26 +230,26 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 
       <!-- Card 1: Workforce Profile -->
       <div class="bg-white rounded-[2.5rem] border border-stone-200 p-8 shadow-sm space-y-6">
-        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">1</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Client Workforce Profile</h3></div>
+        <div class="flex items-center gap-3"><div class="w-9 h-9 bg-plum text-white rounded-full flex items-center justify-center text-sm font-black shrink-0">1</div><h3 class="font-black text-stone-800 text-base uppercase tracking-widest">Client Workforce Profile</h3></div>
         <div class="grid grid-cols-2 gap-4">
-          <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2">Number of Employees</label><input type="number" id="inp-employees" class="calc-input" value="250" min="10" max="50000"></div>
-          <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2">Avg. Annual Salary ($)</label><input type="number" id="inp-salary" class="calc-input" value="65000" min="20000" max="500000"></div>
+          <div class="col-span-2 sm:col-span-1"><label class="block text-sm font-bold uppercase tracking-widest text-stone-500 mb-2">Number of Employees</label><input type="number" id="inp-employees" class="calc-input" value="250" min="10" max="50000"></div>
+          <div class="col-span-2 sm:col-span-1"><label class="block text-sm font-bold uppercase tracking-widest text-stone-500 mb-2">Avg. Annual Salary ($)</label><input type="number" id="inp-salary" class="calc-input" value="65000" min="20000" max="500000"></div>
           <div class="col-span-2">
-            <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-1">Employer Health Premium / Employee / Year ($)</label>
-            <p class="text-[10px] text-stone-400 italic mb-2">US avg ~$15,000 — KFF 2023 Employer Health Benefits Survey</p>
+            <label class="block text-sm font-bold uppercase tracking-widest text-stone-500 mb-1">Employer Health Premium / Employee / Year ($)</label>
+            <p class="text-sm text-stone-400 italic mb-2">US avg ~$15,000 — KFF 2023 Employer Health Benefits Survey</p>
             <input type="number" id="inp-healthpremium" class="calc-input" value="15000" min="3000" max="40000">
           </div>
         </div>
         <div>
-          <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">% Workforce Reporting High Stress</p><p class="text-[10px] text-stone-400 italic">APA national avg: ~40%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-stress">40%</span></div>
+          <div class="flex justify-between items-end mb-2"><div><p class="text-sm font-bold uppercase tracking-widest text-stone-500">% Workforce Reporting High Stress</p><p class="text-sm text-stone-400 italic">APA national avg: ~40%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-stress">40%</span></div>
           <input type="range" id="inp-stress" min="10" max="80" step="1" value="40" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>10%</span><span>80%</span></div>
+          <div class="flex justify-between text-sm text-stone-400 mt-1"><span>10%</span><span>80%</span></div>
         </div>
         <div class="bg-brand-teal/5 border border-brand-teal/20 rounded-2xl p-5">
-          <label class="block text-[10px] font-black uppercase tracking-widest text-brand-teal mb-1">Available Carrier Wellness Fund ($)</label>
-          <p class="text-[10px] text-stone-500 italic mb-3">Cigna, BCBS &amp; United clients typically have $10k–$75k unspent annually. Enter 0 if unknown.</p>
+          <label class="block text-sm font-bold uppercase tracking-widest text-brand-teal mb-1">Available Carrier Wellness Fund ($)</label>
+          <p class="text-sm text-stone-500 italic mb-3">Cigna, BCBS &amp; United clients typically have $10k–$75k unspent annually. Enter 0 if unknown.</p>
           <input type="number" id="inp-wellness-fund" class="calc-input" value="0" min="0" max="500000" placeholder="e.g. 25000">
-          <div id="lbl-wellness-coverage" class="mt-3 text-[10px] font-bold text-brand-teal hidden"></div>
+          <div id="lbl-wellness-coverage" class="mt-3 text-sm font-bold text-brand-teal hidden"></div>
         </div>
       </div>
 
@@ -258,27 +258,27 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="flex items-center gap-3"><div class="w-8 h-8 bg-plum text-white rounded-full flex items-center justify-center text-xs font-black shrink-0">2</div><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Program &amp; Operational Metrics</h3></div>
         <div class="bg-brand-teal/5 border border-brand-teal/20 rounded-2xl p-5">
           <div class="flex justify-between items-end mb-2">
-            <div><p class="text-[10px] font-black uppercase tracking-widest text-brand-teal">Employee Participation Rate</p><p class="text-[10px] text-stone-500 italic mt-0.5">% of total workforce who will attend the program. New programs typically see 20-30%.</p></div>
+            <div><p class="text-sm font-bold uppercase tracking-widest text-brand-teal">Employee Participation Rate</p><p class="text-sm text-stone-500 italic mt-0.5">% of total workforce who will attend the program. New programs typically see 20-30%.</p></div>
             <span class="text-brand-teal font-black text-xl ml-4" id="lbl-participation">25%</span>
           </div>
           <input type="range" id="inp-participation" min="5" max="80" step="1" value="25" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-2"><span>5% minimal</span><span>20-30% realistic</span><span>80% max</span></div>
-          <p class="text-[10px] text-stone-500 italic mt-2">ROI scales with both participation rate and stage effectiveness combined.</p>
+          <div class="flex justify-between text-sm text-stone-400 mt-2"><span>5% minimal</span><span>20-30% realistic</span><span>80% max</span></div>
+          <p class="text-sm text-stone-500 italic mt-2">ROI scales with both participation rate and stage effectiveness combined.</p>
         </div>
         <div>
-          <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Annual Voluntary Turnover Rate</p><p class="text-[10px] text-stone-400 italic">SHRM avg: ~18%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-turnover">18%</span></div>
+          <div class="flex justify-between items-end mb-2"><div><p class="text-sm font-bold uppercase tracking-widest text-stone-500">Annual Voluntary Turnover Rate</p><p class="text-sm text-stone-400 italic">SHRM avg: ~18%</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-turnover">18%</span></div>
           <input type="range" id="inp-turnover" min="5" max="60" step="1" value="18" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>5%</span><span>60%</span></div>
+          <div class="flex justify-between text-sm text-stone-400 mt-1"><span>5%</span><span>60%</span></div>
         </div>
         <div>
-          <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Avg. Unplanned Absence Days / Employee / Year</p><p class="text-[10px] text-stone-400 italic">BLS avg: ~8.7 days</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-absent">8.7</span></div>
+          <div class="flex justify-between items-end mb-2"><div><p class="text-sm font-bold uppercase tracking-widest text-stone-500">Avg. Unplanned Absence Days / Employee / Year</p><p class="text-sm text-stone-400 italic">BLS avg: ~8.7 days</p></div><span class="text-brand-teal font-black text-xl ml-4" id="lbl-absent">8.7</span></div>
           <input type="range" id="inp-absent" min="2" max="20" step="0.5" value="8.7" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>2</span><span>20 days</span></div>
+          <div class="flex justify-between text-sm text-stone-400 mt-1"><span>2</span><span>20 days</span></div>
         </div>
         <div>
-          <div class="flex justify-between items-end mb-2"><div><p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Current EAP Utilization Rate</p><p class="text-[10px] text-stone-400 italic">Industry avg: &lt;5%</p></div><span class="text-rose-500 font-black text-xl ml-4" id="lbl-eap">4%</span></div>
+          <div class="flex justify-between items-end mb-2"><div><p class="text-sm font-bold uppercase tracking-widest text-stone-500">Current EAP Utilization Rate</p><p class="text-sm text-stone-400 italic">Industry avg: &lt;5%</p></div><span class="text-rose-500 font-black text-xl ml-4" id="lbl-eap">4%</span></div>
           <input type="range" id="inp-eap" min="1" max="20" step="1" value="4" class="w-full">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-1"><span>1%</span><span>20%</span></div>
+          <div class="flex justify-between text-sm text-stone-400 mt-1"><span>1%</span><span>20%</span></div>
         </div>
       </div>
   </div><!-- end full-width cards -->
@@ -290,7 +290,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
       <div class="bg-plum rounded-[2.5rem] p-8 shadow-sm text-white space-y-5 relative overflow-hidden">
         <div class="circle-bg w-32 h-32 bg-white/5 -top-10 -right-10"></div>
         <div class="flex items-center gap-3 relative z-10">
-          <div class="w-8 h-8 bg-white text-plum rounded-full flex items-center justify-center text-xs font-black shrink-0">3</div>
+          <div class="w-9 h-9 bg-white text-plum rounded-full flex items-center justify-center text-sm font-black shrink-0">3</div>
           <h3 class="font-black text-stone-100 text-sm uppercase tracking-widest">Program Stage &amp; Investment</h3>
         </div>
         <p class="text-sm text-stone-300 relative z-10">Select the engagement level that fits your client. Investment is calculated automatically based on headcount. All stages are fundable through carrier wellness dollars.</p>
@@ -299,13 +299,13 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="relative z-10">
           <div class="flex justify-between items-end mb-3">
             <div>
-              <span class="text-[10px] font-black uppercase tracking-widest text-stone-300 block">Program Stage (1–10)</span>
+              <span class="text-sm font-bold uppercase tracking-widest text-stone-300 block">Program Stage (1–10)</span>
               <span class="text-brand-teal font-black text-xl mt-1 block" id="lbl-stage-name">Stage 1 — The Spark</span>
             </div>
             <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">1,725</span></span>
           </div>
           <input type="range" id="inp-stage" min="1" max="10" step="1" value="1" class="w-full plum-track">
-          <div class="flex justify-between text-[10px] text-stone-400 mt-2">
+          <div class="flex justify-between text-sm text-stone-300 mt-2">
             <span>Stage 1<br>The Spark</span>
             <span class="text-center">Stage 5<br>The Alignment</span>
             <span class="text-right">Stage 10<br>The Ecosystem</span>
@@ -315,17 +315,17 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <!-- Stage detail card -->
         <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase tracking-widest text-stone-300">Program Effectiveness</span>
+            <span class="text-sm font-bold uppercase tracking-widest text-stone-300">Program Effectiveness</span>
             <span class="text-white font-black text-lg" id="lbl-engagement-pct">2%</span>
           </div>
-          <p class="text-stone-300 text-xs italic" id="lbl-stage-intent">Low-barrier pilot to test team engagement.</p>
+          <p class="text-stone-300 text-sm italic" id="lbl-stage-intent">Low-barrier pilot to test team engagement.</p>
           <div class="border-t border-white/10 pt-3">
-            <span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">Services Included</span>
-            <div id="lbl-services" class="space-y-1 text-xs text-stone-200"></div>
+            <span class="text-sm font-bold uppercase tracking-widest text-stone-300 block mb-2">Services Included</span>
+            <div id="lbl-services" class="space-y-1.5 text-sm text-stone-200"></div>
           </div>
           <div class="border-t border-white/10 pt-3">
-            <span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-1">Investment Breakdown</span>
-            <div id="lbl-cost-breakdown" class="space-y-0.5 text-xs text-stone-300"></div>
+            <span class="text-sm font-bold uppercase tracking-widest text-stone-300 block mb-1">Investment Breakdown</span>
+            <div id="lbl-cost-breakdown" class="space-y-1 text-sm text-stone-300"></div>
           </div>
         </div>
 
@@ -354,13 +354,13 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="bg-white rounded-[2.5rem] border border-stone-200 p-8 shadow-sm">
           <div class="flex items-center justify-between mb-6"><h3 class="font-black text-stone-800 text-sm uppercase tracking-widest">Annual Savings by Driver</h3><span class="text-[10px] text-stone-400 font-bold uppercase">Full-Rate / Year 3</span></div>
           <div class="space-y-4">
-            <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-plum shrink-0"></div><span class="text-xs font-bold text-stone-700">Medical Claims Reduction</span></div><span class="font-black text-plum text-sm">$<span id="cat-medical">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-plum cat-bar" id="bar-medical" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">Baicker (2010) + MGH MBSR Study</p></div>
-            <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-brand-teal shrink-0"></div><span class="text-xs font-bold text-stone-700">Absenteeism Reduction</span></div><span class="font-black text-brand-teal text-sm">$<span id="cat-absence">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-brand-teal cat-bar" id="bar-absence" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">Baicker (2010) + Hassard et al. (2018)</p></div>
+            <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-plum shrink-0"></div><span class="text-xs font-bold text-stone-700">Medical Claims Reduction</span></div><span class="font-black text-plum text-sm">$<span id="cat-medical">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-plum cat-bar" id="bar-medical" style="width:0%"></div></div><p class="text-xs text-stone-400 ml-4">Baicker (2010) + MGH MBSR Study</p></div>
+            <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-brand-teal shrink-0"></div><span class="text-xs font-bold text-stone-700">Absenteeism Reduction</span></div><span class="font-black text-brand-teal text-sm">$<span id="cat-absence">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-brand-teal cat-bar" id="bar-absence" style="width:0%"></div></div><p class="text-xs text-stone-400 ml-4">Baicker (2010) + Hassard et al. (2018)</p></div>
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Presenteeism Recovery</span></div><span class="font-black text-amber-600 text-sm">$<span id="cat-presenteeism">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-amber-400 cat-bar" id="bar-presenteeism" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">Kessler (Harvard) + Aetna MBSR (2015)</p></div>
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Voluntary Turnover Reduction</span></div><span class="font-black text-rose-600 text-sm">$<span id="cat-turnover">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-rose-400 cat-bar" id="bar-turnover" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">SHRM (2022) + Gallup (2023)</p></div>
             <div class="space-y-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-stone-500 shrink-0"></div><span class="text-xs font-bold text-stone-700">Workers' Comp BH Comorbidity</span></div><span class="font-black text-stone-600 text-sm">$<span id="cat-wc">—</span></span></div><div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-stone-400 cat-bar" id="bar-wc" style="width:0%"></div></div><p class="text-[10px] text-stone-400 ml-4">NCCI + WorkCare Behavioral Health Report</p></div>
           </div>
-          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-xs font-black uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div><div class="mt-4 bg-plum/5 border border-plum/15 rounded-2xl p-4"><p class="text-[10px] font-black uppercase tracking-widest text-plum mb-1">Full Engagement Model</p><p class="text-[10px] text-stone-500 leading-relaxed">Results apply <strong class="text-plum">program synergy multipliers</strong> — challenges boost habit retention (×1.20), Leadership EQ creates team alignment (×1.10), group coaching cascades to entire teams (×1.30), and individual coaching amplifies org-wide impact (×1.25). Sources: Lally et al. (2010); Goleman (1998); ICF (2020); Harter/Gallup (2020).</p></div>
+          <div class="flex justify-between items-center pt-5 mt-5 border-t border-stone-200"><span class="text-sm font-bold uppercase tracking-widest text-stone-700">Projected Annual Savings</span><span class="text-2xl font-black text-plum">$<span id="res-annual">—</span></span></div><div class="mt-4 bg-plum/5 border border-plum/15 rounded-2xl p-4"><p class="text-[10px] font-black uppercase tracking-widest text-plum mb-1">Full Engagement Model</p><p class="text-[10px] text-stone-500 leading-relaxed">Results apply <strong class="text-plum">program synergy multipliers</strong> — challenges boost habit retention (×1.20), Leadership EQ creates team alignment (×1.10), group coaching cascades to entire teams (×1.30), and individual coaching amplifies org-wide impact (×1.25). Sources: Lally et al. (2010); Goleman (1998); ICF (2020); Harter/Gallup (2020).</p></div>
         </div>
         <!-- EAP vs SM -->
         <div class="bg-stone-50 rounded-[2rem] border border-stone-200 p-6">
@@ -896,7 +896,7 @@ function runCalculator(){
     coverageEl.textContent = outOfPocket === 0
       ? '✓ Fully fundable — wellness dollars cover the full program cost'
       : '→ Est. out-of-pocket after wellness fund: $' + Math.round(outOfPocket).toLocaleString();
-    coverageEl.className = 'mt-3 text-[10px] font-bold ' + (outOfPocket === 0 ? 'text-brand-teal' : 'text-plum') + ' block';
+    coverageEl.className = 'mt-3 text-sm font-bold ' + (outOfPocket === 0 ? 'text-brand-teal' : 'text-plum') + ' block';
   } else {
     coverageEl.classList.add('hidden');
   }
