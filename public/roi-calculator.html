@@ -732,19 +732,19 @@ const STAGES = [
     intent:'Group coaching activates the leadership cascade — 16% of staff trained as culture carriers. A third challenge builds psychological resilience as a sustained practice.' },
 
   { num:8,  name:'The Resilience',
-    engagement:0.75, workshops:4, challenges:3, leq:true, groupCoaching:true, indivCoaching:false, consultant:false, incentiveStage:3,
+    engagement:0.75, workshops:4, challenges:3, leq:true, groupCoaching:true, indivCoaching:false, consultant:false, incentiveStage:2,
     intent:'Full workforce wellness incentives signal that wellbeing is a strategic priority. Every employee receives a tangible recognition of the organization\'s commitment.' },
 
   { num:9,  name:'The Core',
-    engagement:0.88, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:false, incentiveStage:3,
+    engagement:0.88, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:false, incentiveStage:2,
     intent:'Individual coaching for the highest-impact leaders (5% of staff) creates executive-level transformation that cascades to every team in the organization.' },
 
   { num:10, name:'The Ecosystem',
-    engagement:1.00, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:true, incentiveStage:3,
+    engagement:1.00, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:true, incentiveStage:2,
     intent:'A dedicated wellness consultant and full platform data access make mental fitness a permanent, measurable, self-sustaining organizational capability.' },
 ];
 
-const BOX_COST = 75;
+const BOX_COST = 100;
 
 function calcInvestment(stage, N) {
   let total = 0;
@@ -1303,7 +1303,7 @@ function buildPDFDoc(){
     if(d.stage.indivCoaching) svc.push(['Individual Coaching — '+Math.round(d.employees*0.05)+' leaders','$5,000 per leader  |  1:1 coaching for top 5% of staff']);
     if(d.stage.consultant) svc.push(['Dedicated Wellness Consultant','$10,000  |  Strategic oversight and platform data access']);
     const bLbl=d.stage.incentiveStage===3?'Wellness Boxes — Full Workforce':d.stage.incentiveStage===2?'Wellness Boxes — Per Challenge & Workshop':'Wellness Boxes — Per Workshop';
-    svc.push([bLbl,'$75 per box  |  Physical or digital options']);
+    svc.push([bLbl,'$100 per box  |  Physical or digital options']);
 
     svc.forEach(s=>{
       h2(DARK); doc.setFontSize(11);
