@@ -746,7 +746,7 @@ const STAGES = [
 
 const BOX_COST = 100;
 
-function calcInvestment(stage, N) {
+function calcInvestment(stage, N, participRate = 1) {
   let total = 0;
   const breakdown = [];
 
@@ -755,11 +755,12 @@ function calcInvestment(stage, N) {
   total += wCost;
   breakdown.push({ label: `${stage.workshops} Workshop${stage.workshops>1?'s':''}`, cost: wCost });
 
-  // Challenges
+  // Challenges — priced per participating employee only
   if (stage.challenges > 0) {
-    const cCost = stage.challenges * N * 30;
+    const participatingN = Math.round(N * participRate);
+    const cCost = stage.challenges * participatingN * 30;
     total += cCost;
-    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''}`, cost: cCost });
+    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''} (${participatingN} participants)`, cost: cCost });
   }
 
   // LEQ Series
@@ -805,8 +806,8 @@ function calcInvestment(stage, N) {
   return { total, breakdown };
 }
 
-function updateStageDisplay(stage, N) {
-  const { total, breakdown } = calcInvestment(stage, N);
+function updateStageDisplay(stage, N, participRate = 1) {
+  const { total, breakdown } = calcInvestment(stage, N, participRate);
 
   document.getElementById('lbl-stage-name').textContent = `Stage ${stage.num} — ${stage.name}`;
   document.getElementById('lbl-investment').textContent = total.toLocaleString();
@@ -855,7 +856,7 @@ function runCalculator(){
   const stageIdx     = parseInt(document.getElementById('inp-stage').value) - 1;
 
   const stage = STAGES[stageIdx];
-  const { total: investment } = updateStageDisplay(stage, employees);
+  const { total: investment } = updateStageDisplay(stage, employees, participRate);
   // Base: participation rate × stage effectiveness
   let pf = participRate * stage.engagement;
 
@@ -890,7 +891,7 @@ function runCalculator(){
   // Wellness fund coverage display
   const coverageEl = document.getElementById('lbl-wellness-coverage');
   if(wellnessFund > 0){
-    const stageInv = calcInvestment(STAGES[parseInt(document.getElementById('inp-stage').value)-1], employees).total;
+    const stageInv = calcInvestment(STAGES[parseInt(document.getElementById('inp-stage').value)-1], employees, participRate).total;
     const outOfPocket = Math.max(0, stageInv - wellnessFund);
     coverageEl.classList.remove('hidden');
     coverageEl.textContent = outOfPocket === 0
@@ -1352,7 +1353,7 @@ function buildPDFDoc(){
     doc.text('INVESTMENT BREAKDOWN',M,y);
     y+=7;
 
-    const bk=calcInvestment(d.stage,d.employees).breakdown;
+    const bk=calcInvestment(d.stage,d.employees,d.participRate).breakdown;
     bk.forEach((item,i)=>{
       if(i%2===0){ doc.setFillColor(253,251,247); doc.rect(M,y-3,CW,8,'F'); }
       p(DARK);
