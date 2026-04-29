@@ -946,11 +946,11 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
             </div>
             <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">1,725</span></span>
           </div>
-          <input type="range" id="inp-stage" min="1" max="10" step="1" value="1" class="w-full plum-track">
+          <input type="range" id="inp-stage" min="1" max="6" step="1" value="1" class="w-full plum-track">
           <div class="flex justify-between text-sm text-stone-300 mt-2">
-            <span>Stage 1<br>The Spark</span>
-            <span class="text-center">Stage 5<br>The Alignment</span>
-            <span class="text-right">Stage 10<br>The Ecosystem</span>
+            <span>Stage 1<br>Foundation</span>
+            <span class="text-center">Stage 3<br>Resilience</span>
+            <span class="text-right">Stage 6<br>Ecosystem</span>
           </div>
         </div>
 
@@ -958,9 +958,9 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
         <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-sm font-bold uppercase tracking-widest text-stone-300">Program Effectiveness</span>
-            <span class="text-white font-black text-lg" id="lbl-engagement-pct">2%</span>
+            <span class="text-white font-black text-lg" id="lbl-engagement-pct">25%</span>
           </div>
-          <p class="text-stone-300 text-sm italic" id="lbl-stage-intent">Low-barrier pilot to test team engagement.</p>
+          <p class="text-stone-300 text-sm italic" id="lbl-stage-intent">Two workshops paired with a 14-day challenge — a complete entry curriculum that anchors learning into daily habit.</p>
           <div class="border-t border-white/10 pt-3">
             <span class="text-sm font-bold uppercase tracking-widest text-stone-300 block mb-2">Services Included</span>
             <div id="lbl-services" class="space-y-1.5 text-sm text-stone-200"></div>
@@ -1118,7 +1118,7 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
 
       <div>
         <strong class="text-stone-700 block mb-1.5 text-xs">Stage Design &amp; Conservatism Principles</strong>
-        <p>The 10 stages follow a <strong>Stepped Care Model</strong> (Bower &amp; Gilbody, 2005): each stage adds one meaningful evidence-based layer, building on the last. Stage 2 pairs a 14-day challenge with the first workshop immediately — activating habit formation before skills fade (Ebbinghaus forgetting curve: 67% of learning lost without practice). Challenges, LEQ, group coaching, and individual coaching each carry research-backed synergy multipliers that reflect their proven cascade effects beyond direct participants. The engagement rate (from the selected stage) multiplies all driver calculations — higher engagement = proportionally greater savings, but never beyond what the underlying research supports. Behavioral change ramp-up: Year 1 = 45% of full savings, Year 2 = 80%, Year 3 = 100%. Where multiple studies are available, we use weighted blends with the most conservative applicable estimate from each source. All projections are evidence-based estimates; actual results vary by organization, industry, implementation quality, and baseline health status. This model does not constitute a guarantee of financial performance or medical outcomes.</p>
+        <p>The 6 stages follow a <strong>Stepped Care Model</strong> (Bower &amp; Gilbody, 2005): each stage adds one meaningful evidence-based layer, building on the last. Every stage from Stage 1 onward pairs workshops with a 14-day challenge — activating habit formation immediately, before skills fade (Ebbinghaus forgetting curve: 67% of learning lost without practice). Challenges, LEQ, group coaching, and individual coaching each carry research-backed synergy multipliers that reflect their proven cascade effects beyond direct participants. The engagement rate (from the selected stage) multiplies all driver calculations — higher engagement = proportionally greater savings, but never beyond what the underlying research supports. Behavioral change ramp-up: Year 1 = 45% of full savings, Year 2 = 80%, Year 3 = 100%. Where multiple studies are available, we use weighted blends with the most conservative applicable estimate from each source. All projections are evidence-based estimates; actual results vary by organization, industry, implementation quality, and baseline health status. This model does not constitute a guarantee of financial performance or medical outcomes.</p>
         <p class="mt-1 text-stone-400 italic">Anchored on Deloitte UK (2024) · 65 cited sources spanning RCTs, meta-analyses, systematic reviews, and industry benchmarks · Stepped care model · Conservative factors and counter-evidence transparently documented</p>
       </div>
     </div>
@@ -1380,45 +1380,29 @@ let isUnlocked = false, roiChart = null, calcData = {}, brokerInfo = {};
 //   Individual coaching ×1.25 (executive org impact — ICF 2020)
 
 const STAGES = [
-  { num:1,  name:'The Spark',
-    engagement:0.05, workshops:1, challenges:0, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1,
-    intent:'A single workshop to introduce mental fitness, build shared language, and test team receptivity — the lowest-risk entry point.' },
-
-  { num:2,  name:'The Practice',
-    engagement:0.15, workshops:1, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1,
-    intent:'Pair the workshop with an immediate 14-day challenge — locking skills into daily habit before they fade. Ebbinghaus: 67% of learning is lost without practice.' },
-
-  { num:3,  name:'The Foundation',
+  { num:1,  name:'Foundation',
     engagement:0.25, workshops:2, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1,
-    intent:'A second workshop deepens the skill set already anchored by the challenge. Double the coverage, compounding returns on formed habits.' },
+    intent:'A two-workshop curriculum paired with a 14-day challenge — establishing shared mental fitness language and locking initial skills into daily habit. Carolan et al. workplace meta-analysis (21 RCTs) supports moderate measurable impact at this tier.' },
 
-  { num:4,  name:'The Habit',
-    engagement:0.35, workshops:3, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
-    intent:'A three-workshop series builds a complete mental fitness curriculum — covering stress, resilience, and team dynamics — on a strong habit foundation.' },
+  { num:2,  name:'Habit',
+    engagement:0.40, workshops:4, challenges:2, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
+    intent:'Four workshops cover the full mental fitness curriculum — stress regulation, resilience, communication, and team dynamics — anchored by two 14-day challenges that compound habit formation. Maximum direct skill investment in the workforce before introducing leadership training.' },
 
-  { num:5,  name:'The Alignment',
-    engagement:0.45, workshops:3, challenges:2, leq:true, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
-    intent:'Leadership EQ series aligns management with the team. A second challenge compounds habit formation. Leaders model the behaviors they ask of their teams.' },
+  { num:3,  name:'Resilience',
+    engagement:0.55, workshops:2, challenges:2, leq:true, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
+    intent:'Leadership EQ enters the program. Two foundational workshops deliver core mental fitness skills to staff while managers receive dedicated EQ training to model and reinforce those same skills. Goleman: leader EQ accounts for 70% of team emotional climate — adding the leadership layer creates more reach than additional workshops alone.' },
 
-  { num:6,  name:'The Shift',
-    engagement:0.55, workshops:4, challenges:2, leq:true, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
-    intent:'Maximum workshop coverage across all key mental fitness domains, paired with sustained challenges and full leadership alignment. Culture begins to shift.' },
+  { num:4,  name:'Alignment',
+    engagement:0.65, workshops:4, challenges:2, leq:true, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
+    intent:'Maximum workshop coverage across all key mental fitness domains, paired with sustained challenges and full leadership EQ alignment. Team-level psychological safety begins to take hold systemically as managers and staff are operating from the same skill foundation.' },
 
-  { num:7,  name:'The Mastery',
-    engagement:0.65, workshops:4, challenges:3, leq:true, groupCoaching:true, indivCoaching:false, consultant:false, incentiveStage:2,
-    intent:'Group coaching activates the leadership cascade — 16% of staff trained as culture carriers. A third challenge builds psychological resilience as a sustained practice.' },
+  { num:5,  name:'Culture Shift',
+    engagement:0.80, workshops:4, challenges:2, leq:true, groupCoaching:true, indivCoaching:false, consultant:false, incentiveStage:2,
+    intent:'Group coaching activates the leadership cascade: roughly 16% of staff (the manager layer) is coached, reaching ~84% of the workforce indirectly. Harter/Gallup Q12 meta-analyses confirm the cascade mechanism. Full workshop coverage and sustained challenges complete the systemic shift.' },
 
-  { num:8,  name:'The Resilience',
-    engagement:0.75, workshops:4, challenges:3, leq:true, groupCoaching:true, indivCoaching:false, consultant:false, incentiveStage:2,
-    intent:'Full workforce wellness incentives signal that wellbeing is a strategic priority. Every employee receives a tangible recognition of the organization\'s commitment.' },
-
-  { num:9,  name:'The Core',
-    engagement:0.88, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:false, incentiveStage:2,
-    intent:'Individual coaching for the highest-impact leaders (5% of staff) creates executive-level transformation that cascades to every team in the organization.' },
-
-  { num:10, name:'The Ecosystem',
-    engagement:1.00, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:true, incentiveStage:2,
-    intent:'A dedicated wellness consultant and full platform data access make mental fitness a permanent, measurable, self-sustaining organizational capability.' },
+  { num:6,  name:'Ecosystem',
+    engagement:1.00, workshops:4, challenges:4, leq:true, groupCoaching:true, indivCoaching:true, consultant:true, consultantFree:true, incentiveStage:2,
+    intent:'The full stepped-care model (Bower & Gilbody, 2005). Individual coaching for highest-impact leaders, a dedicated wellness consultant, and full platform data access make mental fitness a permanent, measurable, self-sustaining organizational capability.' },
 ];
 
 const BOX_COST = 100;
@@ -1462,9 +1446,11 @@ function calcInvestment(stage, N, participRate = 1) {
   }
 
   // Wellness Consultant
-  if (stage.consultant) {
+  if (stage.consultant && !stage.consultantFree) {
     total += 10000;
     breakdown.push({ label: 'Dedicated Wellness Consultant + Platform Access', cost: 10000 });
+  } else if (stage.consultant && stage.consultantFree) {
+    breakdown.push({ label: 'Dedicated Wellness Consultant + Platform Access (included)', cost: 0 });
   }
 
   // Incentives (Wellness Boxes)
@@ -1553,12 +1539,12 @@ function runCalculator(){
   //    Project Aristotle (2016): psych safety (an EQ output) is #1 team performance driver.
   if(stage.leq && !stage.groupCoaching) pf = pf * 1.10;
 
-  // 3. Group coaching cascade (stages 7-10): ×1.30
+  // 3. Group coaching cascade (Stage 5+): ×1.30
   //    16% of staff coached → each leader influences ~8-12 direct reports.
   //    Harter et al. Gallup (2020): manager quality explains 70% of team engagement.
   if(stage.groupCoaching) pf = pf * 1.30;
 
-  // 4. Individual coaching cascade (stages 9-10): ×1.25
+  // 4. Individual coaching cascade (Stage 6): ×1.25
   //    Executive 1:1 coaching has broadest organizational impact.
   //    ICF Global Coaching Study (2020): median coaching ROI = 7:1.
   if(stage.indivCoaching) pf = pf * 1.25;
