@@ -1007,22 +1007,6 @@ input[type=range].plum-track::-webkit-slider-runnable-track{background:#e5e7eb}
           <span class="text-5xl md:text-6xl font-black text-white relative z-10">$<span id="res-total3yr">—</span></span>
           <span class="block text-sm text-teal-200 mt-2 font-medium relative z-10">Across all 5 cost drivers</span>
         </div>
-        <!-- Wellness Fund Bonus Callout (only shown when fund > 0) -->
-        <div id="wellness-fund-callout" class="hidden bg-white border-2 border-plum/15 rounded-[2rem] p-6 shadow-sm">
-          <div class="flex items-start gap-4">
-            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-plum/10 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-plum" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <span class="text-[10px] font-black uppercase tracking-widest text-plum block mb-1">Net 3-Year Impact After Wellness Fund</span>
-              <div class="flex items-baseline gap-3 flex-wrap">
-                <span class="text-3xl md:text-4xl font-black text-plum">$<span id="res-total3yr-with-fund">—</span></span>
-                <span class="text-sm text-stone-500 font-medium">includes <span id="res-fund-absorbed-3yr" class="font-black text-plum">$0</span> in wellness fund value preserved</span>
-              </div>
-              <p class="text-xs text-stone-500 mt-2 leading-snug">Carrier wellness dollars are use-it-or-lose-it. Your SkillfulMeans engagement absorbs <span id="res-fund-absorbed-annual" class="font-bold text-plum">$0</span> annually that would otherwise expire — adding to your total realized value over 3 years.</p>
-            </div>
-          </div>
-        </div>
         <!-- ROI + Payback -->
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white border border-stone-200 rounded-[2rem] p-6 text-center shadow-sm"><span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">3-Year Net ROI</span><span class="text-4xl font-black text-plum"><span id="res-roi">—</span>%</span></div>
@@ -1715,15 +1699,11 @@ function runCalculator(){
   const netROI     = ((total3yr - investment * 3) / (investment * 3)) * 100;
   const paybackMo  = Math.max(1, Math.round(investment / (annualSavings / 12)));
 
-  // Wellness Fund Value Preserved (Option B):
-  // Wellness fund dollars are use-it-or-lose-it, reset annually. The SkillfulMeans
-  // program absorbs fund dollars that would otherwise expire. We cap at program cost
-  // so we never claim more fund value than the program actually consumed in a year.
-  const fundAbsorbedAnnual = Math.min(wellnessFund, investment);
-  const fundAbsorbed3yr    = fundAbsorbedAnnual * 3;
-  const total3yrWithFund   = total3yr + fundAbsorbed3yr;
+  // Wellness fund display only — no impact on savings/ROI calculations.
+  // The simpler "out-of-pocket after wellness fund" line under cost breakdown
+  // is wired separately in the cost section.
 
-  calcData = { employees, avgSalary, healthPrem, stressRate, wellnessFund, participRate, stageEffectiveness: stage.engagement, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, fundAbsorbedAnnual, fundAbsorbed3yr, total3yrWithFund, stage };
+  calcData = { employees, avgSalary, healthPrem, stressRate, wellnessFund, participRate, stageEffectiveness: stage.engagement, turnoverRate, absDays, eapPct, investment, medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, annualSavings, y1, y2, y3, total3yr, netROI, paybackMo, stage };
 
   const maxCat = Math.max(medSavings, absSavings, pressSavings, turnoverSavings, wcSavings, 1);
   const bp = v => Math.round((v / maxCat) * 100) + '%';
@@ -1735,19 +1715,6 @@ function runCalculator(){
   document.getElementById('res-y1').textContent        = fmt(y1);
   document.getElementById('res-y2').textContent        = fmt(y2);
   document.getElementById('res-y3').textContent        = fmt(y3);
-
-  // Wellness Fund Callout — only show when fund > 0 AND program actually consumes some of it
-  const fundCallout = document.getElementById('wellness-fund-callout');
-  if (fundCallout) {
-    if (wellnessFund > 0 && fundAbsorbedAnnual > 0) {
-      fundCallout.classList.remove('hidden');
-      document.getElementById('res-total3yr-with-fund').textContent  = fmt(total3yrWithFund);
-      document.getElementById('res-fund-absorbed-3yr').textContent   = '$' + fmt(fundAbsorbed3yr);
-      document.getElementById('res-fund-absorbed-annual').textContent = '$' + fmt(fundAbsorbedAnnual);
-    } else {
-      fundCallout.classList.add('hidden');
-    }
-  }
   document.getElementById('cat-medical').textContent      = fmt(medSavings);
   document.getElementById('cat-absence').textContent      = fmt(absSavings);
   document.getElementById('cat-presenteeism').textContent = fmt(pressSavings);
@@ -1970,20 +1937,6 @@ function buildPDFDoc(){
   });
   y+=34;
 
-  // Wellness Fund Bonus Line (only if fund > 0 and absorbed > 0)
-  if (d.wellnessFund && d.wellnessFund > 0 && d.fundAbsorbedAnnual > 0) {
-    doc.setFillColor(245, 240, 245); // soft plum tint
-    doc.roundedRect(M, y, CW, 14, 2, 2, 'F');
-    doc.setFillColor(...PLUM);
-    doc.rect(M, y, 2, 14, 'F');
-    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...PLUM);
-    doc.text('NET 3-YEAR IMPACT AFTER WELLNESS FUND',M+5,y+5);
-    doc.setFontSize(13); doc.setFont('helvetica','bold'); doc.setTextColor(...PLUM);
-    doc.text('$'+fmt(d.total3yrWithFund),M+5,y+11);
-    doc.setFontSize(8); doc.setFont('helvetica','italic'); doc.setTextColor(...MID);
-    doc.text('+$'+fmt(d.fundAbsorbed3yr)+' in carrier wellness dollars preserved (use-it-or-lose-it value)', W-M-3, y+11, {align:'right'});
-    y+=18;
-  }
 
   // Driver table
   lbl(TEAL);
@@ -2094,20 +2047,14 @@ function buildPDFDoc(){
     // Wellness fund
     if(d.wellnessFund&&d.wellnessFund>0){
       const oop=Math.max(0,d.investment-d.wellnessFund);
-      const fundAbsorbedAnnual = d.fundAbsorbedAnnual || Math.min(d.wellnessFund, d.investment);
-      const fundAbsorbed3yr = d.fundAbsorbed3yr || (fundAbsorbedAnnual * 3);
       doc.setFillColor(...BGTEAL);
-      doc.roundedRect(M,y,CW,30,2,2,'F');
+      doc.roundedRect(M,y,CW,18,2,2,'F');
       doc.setFillColor(...TEAL);
-      doc.rect(M,y,2,30,'F');
+      doc.rect(M,y,2,18,'F');
       lbl(TEAL);
       doc.text('WELLNESS FUND COVERAGE',M+5,y+6);
       p(DARK);
       doc.text('Available: $'+fmt(d.wellnessFund)+'   |   Out-of-pocket: $'+fmt(oop)+(oop===0?'  (fully funded)':''),M+5,y+13);
-      doc.setFont('helvetica','italic'); doc.setTextColor(...MID); doc.setFontSize(8);
-      doc.text('Carrier wellness dollars are use-it-or-lose-it. This program absorbs $'+fmt(fundAbsorbedAnnual)+' annually',M+5,y+20);
-      doc.text('that would otherwise expire — preserving $'+fmt(fundAbsorbed3yr)+' in client value over 3 years.',M+5,y+25);
-      y+=32;
     }
   }
 
