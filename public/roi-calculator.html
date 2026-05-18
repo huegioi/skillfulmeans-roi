@@ -2006,6 +2006,9 @@ function unlockResults(){
   document.getElementById('results-blur-container').classList.add('unblurred');
   const ov=document.getElementById('unlock-overlay');
   ov.style.opacity='0'; ov.style.pointerEvents='none';
+  // Hide the sticky mobile CTA — no longer needed once unlocked
+  const mobCTA=document.getElementById('mobCTA');
+  if(mobCTA) mobCTA.style.display='none';
   setTimeout(()=>{
     ov.style.display='none';
     // Scroll so "Check Your Email" sits at the top of the viewport
