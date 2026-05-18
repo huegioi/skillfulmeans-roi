@@ -135,6 +135,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   .hamburger-btn { display: flex; }
   .desktop-nav-links { display: none !important; }
   .sticky-mob-cta { display: flex; }
+  .sticky-mob-cta.hidden-until-stage { display: none !important; }
 
   /* Pad body for sticky CTA */
   body { padding-bottom: 72px; }
@@ -2457,9 +2458,78 @@ function initApp(){
 }
 
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',initApp):initApp();
+
+// ── SLIDER BLUR FIX ────────────────────────────────────────────────
+// iOS Safari re-focuses the last active text input when a slider
+// touchend fires, causing the page to scroll back and the keyboard
+// to reopen. Fix: blur any focused text/number input on slider
+// touchstart, before the slider interaction begins.
+function initSliderBlurFix() {
+  document.querySelectorAll('input[type="range"]').forEach(function(slider) {
+    slider.addEventListener('touchstart', function() {
+      var active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') && active.type !== 'range') {
+        active.blur();
+      }
+    }, { passive: true });
+  });
+}
+
+// ── STAGE CTA REVEAL ───────────────────────────────────────────────
+// Show sticky mobile CTA only after user deliberately moves Stage slider.
+function initStageCTAReveal() {
+  var stageSlider = document.getElementById('inp-stage');
+  var cta = document.getElementById('mobCTA');
+  var revealed = false;
+  if (!stageSlider || !cta) return;
+  function revealCTA() {
+    if (!revealed) {
+      revealed = true;
+      cta.classList.remove('hidden-until-stage');
+    }
+  }
+  stageSlider.addEventListener('change', revealCTA);
+  stageSlider.addEventListener('touchend', revealCTA);
+  stageSlider.addEventListener('mouseup', revealCTA);
+}
+
+// ── MOBILE NAV ─────────────────────────────────────────────────────
+function toggleMobileNav(){
+  var nav = document.getElementById('mobileNav');
+  var btn = document.getElementById('hamburgerBtn');
+  if (!nav || !btn) return;
+  var isOpen = nav.classList.toggle('open');
+  btn.innerHTML = isOpen
+    ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+    : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+}
+function closeMobileNav(){
+  var nav = document.getElementById('mobileNav');
+  var btn = document.getElementById('hamburgerBtn');
+  if (nav) nav.classList.remove('open');
+  if (btn) btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+}
+// Close mobile nav when tapping outside
+document.addEventListener('click', function(e){
+  var nav = document.getElementById('mobileNav');
+  var btn = document.getElementById('hamburgerBtn');
+  if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)){
+    nav.classList.remove('open');
+  }
+});
+
+// Initialise mobile-specific features after all functions are defined
+(function(){
+  function onReady(fn){ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn):fn(); }
+  onReady(function(){
+    initSliderBlurFix();
+    initStageCTAReveal();
+  });
+})();
+
 </script>
 <!-- Sticky mobile CTA -->
-<div class="sticky-mob-cta" id="mobCTA">
+<div class="sticky-mob-cta hidden-until-stage" id="mobCTA">
   <div style="flex:1;min-width:0">
     <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;display:block">3-Year Impact</span>
     <span style="font-size:20px;font-weight:900;color:#4a2040">$<span id="mob-total">—</span></span>
