@@ -186,6 +186,48 @@ input[type="range"]::-webkit-slider-runnable-track {
   .sticky-mob-cta { display: none !important; }
 }
 
+
+/* ── Fix 1: Lock Card 3 height — stage detail inner box scrolls, card stays fixed ── */
+.stage-detail-inner {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 767px) {
+  /* Lock the whole plum card to a fixed height */
+  #tool .bg-plum.rounded-\[2\.5rem\] {
+    min-height: 520px;
+  }
+  /* Inner detail box: fixed height + scroll so card never resizes */
+  .stage-detail-inner {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+
+  /* ── Fix 2: Nav edge-to-edge ── */
+  nav {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  nav > div {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* Tighter horizontal padding on all sections for more content width */
+  section {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .main-wrapper {
+    padding-left: 0 !important;
+  }
+  /* Tool section cards: tighter padding */
+  #tool .rounded-\[2\.5rem\] {
+    padding: 1.25rem !important;
+    border-radius: 1.5rem !important;
+  }
+}
+
 </style>
 </head>
 <body class="text-stone-800 antialiased overflow-x-hidden">
@@ -206,9 +248,9 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 <!-- NAV -->
 <nav class="sticky top-0 z-50 bg-[#fdfbf7]/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
     <div class="flex justify-between h-24 items-center">
-      <div class="flex items-center pl-0 sm:pl-10 md:pl-16">
+      <div class="flex items-center">
         <a href="https://www.skillfulmeans.life" target="_blank" class="font-bold text-plum text-3xl tracking-tighter hover:opacity-80 transition">skillfulmeans</a>
       </div>
       <div class="hidden md:flex space-x-8 items-center text-sm font-bold uppercase tracking-widest text-stone-500 desktop-nav-links">
@@ -234,7 +276,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 <!-- EMAIL GATE MODAL -->
 <div id="emailGateModal" class="modal" onclick="closeModal('emailGateModal')">
-  <div style="background:#fdfbf7;margin:10vh auto 0;width:95%;max-width:500px;border-radius:2rem;padding:2.5rem;box-shadow:0 40px 80px -12px rgba(0,0,0,.5);position:relative" onclick="event.stopPropagation()">
+  <div style="background:#fdfbf7;margin:10vh auto 0;width:95%;max-width:500px;border-radius:2rem;padding:2.5rem;box-shadow:0 40px 80px -12px rgba(0,0,0,.5);position:relative;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch" onclick="event.stopPropagation()">
     <div class="text-center mb-6">
       <div class="inline-block bg-plum/10 text-plum px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">Your Analysis Is Ready</div>
       <h2 class="text-2xl font-extrabold text-stone-900">Unlock Your Full ROI Report</h2>
@@ -1105,7 +1147,7 @@ input[type="range"]::-webkit-slider-runnable-track {
         </div>
 
         <!-- Stage detail card -->
-        <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3">
+        <div class="bg-white/10 rounded-2xl p-5 relative z-10 space-y-3 stage-detail-inner">
           <div class="flex items-center justify-between">
             <span class="text-sm font-bold uppercase tracking-widest text-stone-300">Program Effectiveness</span>
             <span class="text-white font-black text-lg" id="lbl-engagement-pct">25%</span>
