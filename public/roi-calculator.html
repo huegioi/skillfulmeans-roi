@@ -1174,7 +1174,7 @@ input[type="range"]::-webkit-slider-runnable-track {
       <div id="results-blur-container" class="results-blur space-y-5">
 
         <!-- CHECK YOUR EMAIL NOTIFICATION -->
-        <div class="flex items-center gap-4 bg-white border border-plum/20 rounded-2xl px-5 py-4 shadow-sm">
+        <div id="check-email-notice" class="flex items-center gap-4 bg-white border border-plum/20 rounded-2xl px-5 py-4 shadow-sm">
           <div class="flex-shrink-0 w-10 h-10 rounded-full bg-plum flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -2006,7 +2006,16 @@ function unlockResults(){
   document.getElementById('results-blur-container').classList.add('unblurred');
   const ov=document.getElementById('unlock-overlay');
   ov.style.opacity='0'; ov.style.pointerEvents='none';
-  setTimeout(()=>{ov.style.display='none';},500);
+  setTimeout(()=>{
+    ov.style.display='none';
+    // Scroll so "Check Your Email" sits at the top of the viewport
+    const target = document.getElementById('check-email-notice');
+    if(target){
+      const navH = document.querySelector('nav') ? document.querySelector('nav').offsetHeight : 96;
+      const y = target.getBoundingClientRect().top + window.scrollY - navH - 16;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  },500);
   const ps=document.getElementById('pdf-strip');
   ps.style.display='flex';
 }
