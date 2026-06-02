@@ -1615,6 +1615,33 @@ const STAGES = [
 
 const BOX_COST = 100;
 
+// Challenge slot-based tiered pricing (SkillfulMeans pricing sheet)
+const CHALLENGE_TIERS = [
+  { slots: 40,   price: 27 },
+  { slots: 50,   price: 25 },
+  { slots: 60,   price: 24 },
+  { slots: 100,  price: 22 },
+  { slots: 150,  price: 20 },
+  { slots: 200,  price: 18 },
+  { slots: 250,  price: 15 },
+  { slots: 300,  price: 14 },
+  { slots: 350,  price: 13 },
+  { slots: 400,  price: 12 },
+  { slots: 500,  price: 10 },
+  { slots: 1000, price:  9 },
+];
+
+function getChallengePricePerPerson(participants) {
+  // Minimum 40 slots; above 1,000 stays at $9
+  const slots = Math.max(40, participants);
+  let price = CHALLENGE_TIERS[0].price; // fallback: $27
+  for (const tier of CHALLENGE_TIERS) {
+    if (slots >= tier.slots) { price = tier.price; }
+    else { break; }
+  }
+  return price;
+}
+
 function calcInvestment(stage, N, participRate = 1) {
   let total = 0;
   const breakdown = [];
@@ -1624,12 +1651,13 @@ function calcInvestment(stage, N, participRate = 1) {
   total += wCost;
   breakdown.push({ label: `${stage.workshops} Workshop${stage.workshops>1?'s':''}`, cost: wCost });
 
-  // Challenges — priced per participating employee only
+  // Challenges — tiered slot-based pricing
   if (stage.challenges > 0) {
-    const participatingN = Math.round(N * participRate);
-    const cCost = stage.challenges * participatingN * 30;
+    const participatingN = Math.max(40, Math.round(N * participRate));
+    const pricePerPerson = getChallengePricePerPerson(participatingN);
+    const cCost = stage.challenges * participatingN * pricePerPerson;
     total += cCost;
-    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''} (${participatingN} participants)`, cost: cCost });
+    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''} (${participatingN} slots @ $${pricePerPerson}/person)`, cost: cCost });
   }
 
   // LEQ Series
