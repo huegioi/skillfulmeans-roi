@@ -1214,7 +1214,7 @@ input[type="range"]::-webkit-slider-runnable-track {
         </div>
         <!-- ROI + Payback -->
         <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white border border-stone-200 rounded-[2rem] p-6 text-center shadow-sm"><span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">3-Year Net ROI</span><span class="text-4xl font-black text-plum"><span id="res-roi">—</span>%</span></div>
+          <div class="bg-white border border-stone-200 rounded-[2rem] p-6 text-center shadow-sm"><span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">Annual Net ROI</span><span class="text-4xl font-black text-plum"><span id="res-roi">—</span>%</span></div>
           <div class="bg-white border border-stone-200 rounded-[2rem] p-6 text-center shadow-sm"><span class="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-2">Payback Period</span><span class="text-4xl font-black text-plum"><span id="res-payback">—</span> <span class="text-base font-bold">mo</span></span></div>
         </div>
         <!-- Driver Breakdown -->
@@ -1616,6 +1616,8 @@ const BOX_COST = 100;
 // So program cost reflects what it actually takes to deliver at scale.
 const WORKSHOP_WEBINAR_CAP = 150; // seats per live workshop webinar session
 const CHALLENGE_RUN_CAP = 150;    // participants per challenge run
+const ROI_CAP_PER_DOLLAR = 8;     // research-supported asymptotic ceiling on annual return per $1 (Deloitte UK 2024 high end)
+const ROI_CAP_KNEE = 5;           // return per $1 above which the soft ceiling begins compressing
 const LEQ_PER_LEADER = 250;       // Leadership EQ price per senior leader
 const LEQ_MIN = 10000;            // minimum charge for the Leadership EQ series
 const LEADER_FRACTION = 0.05;     // senior leadership as a share of headcount
@@ -1889,7 +1891,7 @@ function runCalculator(){
   //   Applied conservatively to stress-attributed portion only at 5% capture.
   const medUnutzer = stressedEmp * pf * (3363 / 4) * 0.05;
 
-  const medSavings = (medMGH * 0.50) + (medGoetzel * 0.30) + (medUnutzer * 0.20);
+  let medSavings = (medMGH * 0.50) + (medGoetzel * 0.30) + (medUnutzer * 0.20);
 
   // ── Driver 2: Absenteeism ───────────────────────────────────────
   // NOTE: Baicker (2010) removed from formula (see medical driver note above).
@@ -1908,7 +1910,7 @@ function runCalculator(){
   //   structured programs reduce this by approximately 30%.
   const absHemp = employees * pf * 603 * 0.30 * 0.10;
 
-  const absSavings = absHassard * 0.60 + absHemp * 0.40;
+  let absSavings = absHassard * 0.60 + absHemp * 0.40;
 
   // ── Driver 3: Presenteeism ──────────────────────────────────────
   // RESTRUCTURED: Previous version included Wang (whole-program 6:1 ROI) and WHO ($4 per $1)
@@ -1947,7 +1949,7 @@ function runCalculator(){
   //   recovery on Stewart's 7.5% salary baseline.
   const pressMGH = stressedEmp * pf * avgSalary * 0.075 * 0.12;
 
-  const pressSavings = (pressStewartAetna * 0.45) + (pressMITSloan * 0.30) + (pressHofmann * 0.15) + (pressMGH * 0.10);
+  let pressSavings = (pressStewartAetna * 0.45) + (pressMITSloan * 0.30) + (pressHofmann * 0.15) + (pressMGH * 0.10);
 
   // ── Driver 4: Turnover ──────────────────────────────────────────
   // SOURCE A: SHRM Benchmarking Report (2022) — replacement cost = 75% of annual salary
@@ -1962,7 +1964,7 @@ function runCalculator(){
   // 8–12% reduction in voluntary turnover — scaled by combined participation × effectiveness.
   // Sources: Gallup (2023); Harter et al. (2020); Lyubomirsky et al. (2005)
   const retentionImprovement = Math.min(0.12, pf * 0.15); // max 12% — defensible upper bound
-  const turnoverSavings = employees * turnoverRate * (avgSalary * 0.75) * retentionImprovement;
+  let turnoverSavings = employees * turnoverRate * (avgSalary * 0.75) * retentionImprovement;
 
   // ── Driver 5: Workers' Comp BH Comorbidity ─────────────────────
   // SOURCE A: NCCI Comorbidities Research Brief (2012, updated)
@@ -1976,14 +1978,33 @@ function runCalculator(){
   // version used pf*2 to argue the comorbidity benefit reaches beyond direct participants
   // (coworker spillover + a smaller comorbid-claims pool); that doubling was unsourced and has
   // been removed in favor of the conservative, internally-consistent pf scaling.
-  const wcSavings = totalPayroll * 0.015 * 0.25 * 0.50 * Math.min(pf, 1.0);
+  let wcSavings = totalPayroll * 0.015 * 0.25 * 0.50 * Math.min(pf, 1.0);
 
+  // ── Research-supported ROI ceiling (soft) ───────────────────────
+  // Smoothly compress the implied return-per-$1 toward ROI_CAP_PER_DOLLAR above a knee, so
+  // high-return cases approach — but never pin to — the Deloitte UK 2024 ceiling. This keeps
+  // a cheap program against a large payroll from producing implausible (1,500%+) returns,
+  // while leaving the numbers organic (no flat-lining at a round cap). Rational compression:
+  // below the knee, values are untouched; above it, the excess is gently damped toward the
+  // asymptote. Drivers scale proportionally so the breakdown still sums to the adjusted total.
+  const rawAnnual = medSavings + absSavings + pressSavings + turnoverSavings + wcSavings;
+  const rawPerDollar = rawAnnual / investment;
+  if (rawPerDollar > ROI_CAP_KNEE) {
+    const T = ROI_CAP_KNEE, M = ROI_CAP_PER_DOLLAR;
+    const effPerDollar = M - ((M - T) * (M - T)) / ((rawPerDollar - T) + (M - T));
+    const capFactor = effPerDollar / rawPerDollar;
+    medSavings *= capFactor; absSavings *= capFactor; pressSavings *= capFactor;
+    turnoverSavings *= capFactor; wcSavings *= capFactor;
+  }
   const annualSavings = medSavings + absSavings + pressSavings + turnoverSavings + wcSavings;
+
+  // Headline ROI = annual run-rate: steady-state yearly savings vs. one year of program cost.
+  const netROI     = ((annualSavings - investment) / investment) * 100;
+  // Year-by-year ramp (45/80/100%) retained for the chart and the 3-year cumulative total.
   const y1 = annualSavings * 0.45;
   const y2 = annualSavings * 0.80;
   const y3 = annualSavings * 1.00;
   const total3yr   = y1 + y2 + y3;
-  const netROI     = ((total3yr - investment * 3) / (investment * 3)) * 100;
   const paybackMo  = Math.max(1, Math.round(investment / (annualSavings / 12)));
 
   // Wellness Fund Value Preserved (Option B):
