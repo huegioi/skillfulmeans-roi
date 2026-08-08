@@ -1131,9 +1131,9 @@ input[type="range"]::-webkit-slider-runnable-track {
           <div class="flex justify-between items-end mb-3">
             <div>
               <span class="text-sm font-bold uppercase tracking-widest text-stone-300 block">Program Stage (1–10)</span>
-              <span class="text-brand-teal font-black text-xl mt-1 block" id="lbl-stage-name">Stage 1 — The Spark</span>
+              <span class="text-brand-teal font-black text-xl mt-1 block" id="lbl-stage-name">Stage 1 — Spark</span>
             </div>
-            <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">1,725</span></span>
+            <span class="text-brand-teal font-black text-2xl bg-white px-4 py-1 rounded-xl border-2 border-stone-200 shrink-0 ml-4">$<span id="lbl-investment">&mdash;</span></span>
           </div>
           <input type="range" id="inp-stage" min="1" max="6" step="1" value="1" class="w-full plum-track">
           <div class="flex justify-between text-sm text-stone-300 mt-2">
@@ -1585,11 +1585,11 @@ let isUnlocked = false, roiChart = null, calcData = {}, brokerInfo = {};
 //   Individual coaching ×1.25 (executive org impact — ICF 2020)
 
 const STAGES = [
-  { num:1,  name:'Foundation',
+  { num:1,  name:'Spark',
     engagement:0.25, workshops:2, challenges:1, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:1,
     intent:'A two-workshop curriculum paired with a 14-day challenge — establishing shared mental fitness language and locking initial skills into daily habit. Carolan et al. workplace meta-analysis (21 RCTs) supports moderate measurable impact at this tier.' },
 
-  { num:2,  name:'Habit',
+  { num:2,  name:'Momentum',
     engagement:0.40, workshops:4, challenges:2, leq:false, groupCoaching:false, indivCoaching:false, consultant:false, incentiveStage:2,
     intent:'Four workshops cover the full mental fitness curriculum — stress regulation, resilience, communication, and team dynamics — anchored by two 14-day challenges that compound habit formation. Maximum direct skill investment in the workforce before introducing leadership training.' },
 
@@ -1610,120 +1610,238 @@ const STAGES = [
     intent:'The full stepped-care model (Bower & Gilbody, 2005). Individual coaching for highest-impact leaders, a dedicated wellness consultant, and full platform data access make mental fitness a permanent, measurable, self-sustaining organizational capability.' },
 ];
 
-const BOX_COST = 100;
+// ══════════════════════════════════════════════════════════════════
+//  PRICING — fetched from the SkillfulMeans app, not defined here.
+// ══════════════════════════════════════════════════════════════════
+//
+// Every price comes from the rate card in the main app
+// (base44/shared/rateCard.ts), served by the public feed below. Editing a
+// price on Services → Rate Card in the app changes THIS calculator too, with
+// no redeploy. That is the whole point — do not hard-code a price here.
+//
+// This file used to carry its own copy of a long-dead pricing model: $250 per
+// leader against the real $1,250, a flat $1,500 per session with no
+// extra-section rate, and 150-seat caps instead of 250. It was quoting
+// prospects roughly 40% of the true Stage 1 price.
+//
+// Order of preference:
+//   1. the live feed (refreshed on load)
+//   2. the last good response, cached in localStorage
+//   3. FALLBACK_RATE_CARD below — a snapshot, so a broker on bad wifi still
+//      gets a working tool rather than a broken page
+//
+const RATE_CARD_FEED = 'https://curriculum-designer-05b51a3b.base44.app/functions/getPublicRateCard';
 
-// ── Delivery-cost scaling ─────────────────────────────────────────
-// So program cost reflects what it actually takes to deliver at scale.
-const WORKSHOP_WEBINAR_CAP = 150; // seats per live workshop webinar session
-const CHALLENGE_RUN_CAP = 150;    // participants per challenge run
-const ROI_CAP_PER_DOLLAR = 8;     // research-supported asymptotic ceiling on annual return per $1 (Deloitte UK 2024 high end)
-const ROI_CAP_KNEE = 5;           // return per $1 above which the soft ceiling begins compressing
-const LEQ_PER_LEADER = 250;       // Leadership EQ price per senior leader
-const LEQ_MIN = 10000;            // minimum charge for the Leadership EQ series
-const LEADER_FRACTION = 0.05;     // senior leadership as a share of headcount
+// Snapshot of the app's rate card, 2026-08-08. Only used if the feed and the
+// cache are both unreachable. If you find yourself editing these numbers by
+// hand, something has gone wrong — change them in the app instead.
+const FALLBACK_RATE_CARD = {
+  rates: {
+    workshopFirstSession: 1500, workshopExtraSession: 1200, materialsComponent: 300,
+    attendanceRate: 0.25, maxAttendeesPerSession: 250,
+    challengeEngagementRate: 0.20, challengeMinSlots: 40,
+    leqSeries: 10000, leqCoachingRatePerHour: 1200, leqCoachingHours: 3,
+    leqMaxLeadersPerGroup: 12, leqLcpPerLeader: 1250, leqLeaderRate: 0.005,
+    wellnessBox: 100, boxesPerWorkshopSection: 3, boxesPerChallenge: 3,
+  },
+  challengeTiers: [
+    { min: 40, max: 49, price: 27 }, { min: 50, max: 59, price: 25 },
+    { min: 60, max: 99, price: 24 }, { min: 100, max: 149, price: 22 },
+    { min: 150, max: 199, price: 20 }, { min: 200, max: 249, price: 18 },
+    { min: 250, max: 299, price: 15 }, { min: 300, max: 349, price: 14 },
+    { min: 350, max: 399, price: 13 }, { min: 400, max: 499, price: 12 },
+    { min: 500, max: 999, price: 10 }, { min: 1000, max: null, price: 9 },
+  ],
+  stages: [
+    { stage: 1, name: 'Spark', workshops: 2, challenges: 1, leadershipEQ: false },
+    { stage: 2, name: 'Momentum', workshops: 4, challenges: 2, leadershipEQ: false },
+    { stage: 3, name: 'Resilience', workshops: 2, challenges: 2, leadershipEQ: true, coachingBlocks: 1, lcpRounds: 1 },
+    { stage: 4, name: 'Alignment', workshops: 4, challenges: 2, leadershipEQ: true, coachingBlocks: 1, lcpRounds: 1 },
+    { stage: 5, name: 'Culture Shift', workshops: 4, challenges: 2, leadershipEQ: true, coachingBlocks: 2, lcpRounds: 1 },
+    { stage: 6, name: 'Ecosystem', workshops: 4, challenges: 4, leadershipEQ: true, coachingBlocks: 2, lcpRounds: 2 },
+  ],
+};
 
-// Challenge slot-based tiered pricing (SkillfulMeans pricing sheet)
-const CHALLENGE_TIERS = [
-  { slots: 40,   price: 27 },
-  { slots: 50,   price: 25 },
-  { slots: 60,   price: 24 },
-  { slots: 100,  price: 22 },
-  { slots: 150,  price: 20 },
-  { slots: 200,  price: 18 },
-  { slots: 250,  price: 15 },
-  { slots: 300,  price: 14 },
-  { slots: 350,  price: 13 },
-  { slots: 400,  price: 12 },
-  { slots: 500,  price: 10 },
-  { slots: 1000, price:  9 },
-];
+let RC = FALLBACK_RATE_CARD;        // whatever is currently in force
+let RC_SOURCE = 'fallback';         // 'live' | 'cache' | 'fallback'
+let RC_SERVER_QUOTES = null;        // server-computed quotes, when headcount matches
+let RC_SERVER_HEADCOUNT = null;
 
-function getChallengePricePerPerson(participants) {
-  // Minimum 40 slots; above 1,000 stays at $9
-  const slots = Math.max(40, participants);
-  let price = CHALLENGE_TIERS[0].price; // fallback: $27
-  for (const tier of CHALLENGE_TIERS) {
-    if (slots >= tier.slots) { price = tier.price; }
-    else { break; }
-  }
-  return price;
+// ROI presentation caps — not prices, they stay here.
+const ROI_CAP_PER_DOLLAR = 8;
+const ROI_CAP_KNEE = 5;
+
+function applyRateCard(payload, source) {
+  if (!payload || !payload.rates || !Array.isArray(payload.stages)) return false;
+  RC = payload;
+  RC_SOURCE = source;
+  RC_SERVER_QUOTES = payload.quotes || null;
+  RC_SERVER_HEADCOUNT = payload.headcount || null;
+  // Keep the local STAGES copy's composition in step with the app, so a tier
+  // change in the app shows up here too. engagement + intent stay local:
+  // they belong to the savings model and the copy, not to pricing.
+  payload.stages.forEach(s => {
+    const local = STAGES[s.stage - 1];
+    if (!local) return;
+    // Names and taglines come from the app too, so a rename there reaches
+    // this page without a redeploy.
+    if (s.name) local.name = s.name;
+    local.workshops = s.workshops;
+    local.challenges = s.challenges;
+    local.leq = s.leadershipEQ;
+    local.groupCoaching = s.groupCoaching;
+    local.indivCoaching = s.individualCoaching;
+    local.coachingBlocks = s.coachingBlocks;
+    local.lcpRounds = s.lcpRounds;
+  });
+  return true;
 }
 
-function calcInvestment(stage, N, participRate = 1) {
-  let total = 0;
+async function loadRateCard(headcount) {
+  const url = RATE_CARD_FEED + (headcount ? ('?headcount=' + encodeURIComponent(headcount)) : '');
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const payload = await res.json();
+    if (applyRateCard(payload, 'live')) {
+      try { localStorage.setItem('sm_rate_card', JSON.stringify(payload)); } catch (e) { /* private mode */ }
+      return true;
+    }
+    throw new Error('unexpected shape');
+  } catch (err) {
+    console.warn('[rateCard] live feed unavailable:', err.message);
+    try {
+      const cached = JSON.parse(localStorage.getItem('sm_rate_card') || 'null');
+      if (applyRateCard(cached, 'cache')) {
+        console.warn('[rateCard] using cached copy from', cached.generated_at);
+        return true;
+      }
+    } catch (e) { /* ignore */ }
+    console.warn('[rateCard] using the built-in snapshot — prices may be out of date');
+    return false;
+  }
+}
+
+// ── The pricing formulas, mirroring base44/shared/rateCard.ts ──────
+// These are the only things duplicated from the app, and they are checked
+// against it at runtime (see verifyAgainstServer below).
+
+function sectionsPerWorkshop(N) {
+  const perSection = RC.rates.maxAttendeesPerSession / RC.rates.attendanceRate; // 1,000
+  return Math.max(1, Math.ceil((Number(N) || 0) / perSection));
+}
+
+function workshopTopicPrice(N) {
+  const sections = sectionsPerWorkshop(N);
+  return RC.rates.workshopFirstSession + (sections - 1) * RC.rates.workshopExtraSession;
+}
+
+function challengeSlots(N) {
+  return Math.max(RC.rates.challengeMinSlots,
+                  Math.round((Number(N) || 0) * RC.rates.challengeEngagementRate));
+}
+
+function challengeRatePerPerson(slots) {
+  const t = RC.challengeTiers.find(t => slots >= t.min && (t.max === null || slots <= t.max));
+  return t ? t.price : RC.challengeTiers[RC.challengeTiers.length - 1].price;
+}
+
+function challengePrice(N) {
+  const slots = challengeSlots(N);
+  const raw = slots * challengeRatePerPerson(slots);
+  // A bigger company must never be quoted less than a smaller one: cap at the
+  // cheapest entry price of any larger band.
+  const upBands = RC.challengeTiers.filter(t => t.min > slots).map(t => t.min * t.price);
+  return upBands.length ? Math.min(raw, ...upBands) : raw;
+}
+
+function leadershipEqPrice(N, opts) {
+  const coachingBlocks = (opts && opts.coachingBlocks) || 1;
+  const lcpRounds = (opts && opts.lcpRounds) || 1;
+  const leaders = Math.max(1, Math.ceil((Number(N) || 0) * RC.rates.leqLeaderRate));
+  const groups = Math.max(1, Math.ceil(leaders / RC.rates.leqMaxLeadersPerGroup));
+  const coachingHours = RC.rates.leqCoachingHours * coachingBlocks;
+  const coaching = RC.rates.leqCoachingRatePerHour * coachingHours * groups;
+  const lcp = RC.rates.leqLcpPerLeader * leaders * lcpRounds;
+  return { total: RC.rates.leqSeries + coaching + lcp, leaders, groups, coachingHours, coaching, lcp };
+}
+
+function calcInvestment(stage, N) {
+  const tier = (RC.stages || []).find(s => s.stage === stage.num) || stage;
+  const sections = sectionsPerWorkshop(N);
   const breakdown = [];
+  let total = 0;
 
-  // Workshops — live webinar sessions scale with expected attendance (whole workforce
-  // invited, participation % attends), capped at WORKSHOP_WEBINAR_CAP seats per session.
-  const wsAttendees = Math.max(1, Math.round(N * participRate));
-  const wsSessions = Math.ceil(wsAttendees / WORKSHOP_WEBINAR_CAP);
-  const wCost = stage.workshops * wsSessions * 1500;
+  const perTopic = workshopTopicPrice(N);
+  const wCost = (tier.workshops ?? stage.workshops) * perTopic;
   total += wCost;
-  breakdown.push({ label: `${stage.workshops} Workshop${stage.workshops>1?'s':''}${wsSessions>1?` × ${wsSessions} sessions`:''}`, cost: wCost });
+  breakdown.push({
+    label: `${tier.workshops ?? stage.workshops} Workshop${(tier.workshops ?? stage.workshops) > 1 ? 's' : ''}` +
+           (sections > 1 ? ` × ${sections} sections each` : ''),
+    cost: wCost,
+  });
 
-  // Challenges — tiered per-person pricing; delivered in runs capped at CHALLENGE_RUN_CAP
-  let challengeRuns = 0;
-  if (stage.challenges > 0) {
-    const participatingN = Math.max(40, Math.round(N * participRate));
-    const pricePerPerson = getChallengePricePerPerson(participatingN);
-    const cCost = stage.challenges * participatingN * pricePerPerson;
+  const nCh = tier.challenges ?? stage.challenges;
+  if (nCh > 0) {
+    const slots = challengeSlots(N);
+    const per = challengeRatePerPerson(slots);
+    const cCost = nCh * challengePrice(N);
     total += cCost;
-    challengeRuns = stage.challenges * Math.ceil(participatingN / CHALLENGE_RUN_CAP);
-    breakdown.push({ label: `${stage.challenges} 14-Day Challenge${stage.challenges>1?'s':''} (${participatingN} slots @ $${pricePerPerson}/person)`, cost: cCost });
+    breakdown.push({ label: `${nCh} 14-Day Challenge${nCh > 1 ? 's' : ''} (${slots} slots @ $${per}/person)`, cost: cCost });
   }
 
-  // LEQ Series — $250 per senior leader, minimum $10k
-  if (stage.leq) {
-    const leaders = Math.max(1, Math.round(N * LEADER_FRACTION));
-    const leqCost = Math.max(LEQ_MIN, leaders * LEQ_PER_LEADER);
-    total += leqCost;
-    breakdown.push({ label: `Leadership EQ Series (${leaders} leader${leaders>1?'s':''} @ $${LEQ_PER_LEADER})`, cost: leqCost });
+  if (tier.leadershipEQ ?? stage.leq) {
+    const leq = leadershipEqPrice(N, { coachingBlocks: tier.coachingBlocks, lcpRounds: tier.lcpRounds });
+    total += leq.total;
+    breakdown.push({ label: `Leadership EQ Program (${leq.leaders} leader${leq.leaders > 1 ? 's' : ''} in ${leq.groups} group${leq.groups > 1 ? 's' : ''})`, cost: leq.total });
   }
 
-  // Group Coaching
-  if (stage.groupCoaching) {
-    const cohorts = Math.ceil((N * 0.16) / 12);
-    const gcCost = cohorts * 5000;
-    total += gcCost;
-    breakdown.push({ label: `Group Coaching (${cohorts} cohort${cohorts>1?'s':''})`, cost: gcCost });
-  }
-
-  // Individual Coaching
-  if (stage.indivCoaching) {
-    const icCost = (N * 0.05) * 5000;
-    total += icCost;
-    breakdown.push({ label: `Individual Coaching (${Math.round(N*0.05)} leaders)`, cost: icCost });
-  }
-
-  // Wellness Consultant
-  if (stage.consultant && !stage.consultantFree) {
-    total += 10000;
-    breakdown.push({ label: 'Dedicated Wellness Consultant + Platform Access', cost: 10000 });
-  } else if (stage.consultant && stage.consultantFree) {
+  if (stage.consultant) {
     breakdown.push({ label: 'Dedicated Wellness Consultant + Platform Access (included)', cost: 0 });
   }
 
-  // Incentives (Wellness Boxes) — 3 boxes per workshop SESSION and 3 per challenge RUN, so
-  // rewards scale with delivery as a larger company runs more sessions/runs.
-  const wsBoxes = stage.workshops * wsSessions * 3;
-  const chBoxes = challengeRuns * 3;
-  let boxes = 0;
-  if (stage.incentiveStage === 1) {
-    boxes = stage.challenges > 0 ? chBoxes : wsBoxes;
-  } else if (stage.incentiveStage === 2) {
-    boxes = chBoxes + wsBoxes;
-  } else {
-    boxes = N;
-  }
-  const boxCost = boxes * BOX_COST;
+  // 3 for every workshop SECTION plus 3 for every challenge. Workshops
+  // multiply by sections (each sitting needs its own boxes); challenges do
+  // not, because one challenge covers the whole company via its slot count.
+  const _nW = tier.workshops ?? stage.workshops;
+  const _nC = tier.challenges ?? stage.challenges;
+  const boxes = RC.rates.boxesPerWorkshopSection * _nW * sections
+              + RC.rates.boxesPerChallenge * _nC;
+  const boxCost = boxes * RC.rates.wellnessBox;
   total += boxCost;
-  breakdown.push({ label: `Wellness Boxes (${boxes}${stage.incentiveStage===3?' — full workforce':''})`, cost: boxCost });
+  breakdown.push({
+    label: `Wellness Boxes (${boxes} — ${RC.rates.boxesPerWorkshopSection} per workshop` +
+           (sections > 1 ? ` section, ${_nW} × ${sections}` : '') +
+           ` + ${RC.rates.boxesPerChallenge} per challenge)`,
+    cost: boxCost,
+  });
 
   return { total, breakdown };
 }
 
+// Cross-check the local formulas against the app's own engine. If these ever
+// disagree, the formulas above have drifted and need re-syncing.
+function verifyAgainstServer() {
+  if (!RC_SERVER_QUOTES || !RC_SERVER_HEADCOUNT) return;
+  STAGES.forEach(stage => {
+    const server = RC_SERVER_QUOTES[String(stage.num)];
+    if (!server) return;
+    const local = calcInvestment(stage, RC_SERVER_HEADCOUNT).total;
+    if (local !== server.total) {
+      console.warn(
+        `[rateCard] DRIFT on stage ${stage.num} at ${RC_SERVER_HEADCOUNT} employees: ` +
+        `this page says $${local.toLocaleString()}, the app says $${server.total.toLocaleString()}. ` +
+        `The formulas in roi-calculator.html need re-syncing with base44/shared/rateCard.ts.`
+      );
+    }
+  });
+}
+
 function updateStageDisplay(stage, N, participRate = 1) {
-  const { total, breakdown } = calcInvestment(stage, N, participRate);
+  const { total, breakdown } = calcInvestment(stage, N);
 
   document.getElementById('lbl-stage-name').textContent = `Stage ${stage.num} — ${stage.name}`;
   document.getElementById('lbl-investment').textContent = total.toLocaleString();
@@ -1835,7 +1953,7 @@ function runCalculator(){
   // Wellness fund coverage display
   const coverageEl = document.getElementById('lbl-wellness-coverage');
   if(wellnessFund > 0){
-    const stageInv = calcInvestment(STAGES[parseInt(document.getElementById('inp-stage').value)-1], employees, participRate).total;
+    const stageInv = calcInvestment(STAGES[parseInt(document.getElementById('inp-stage').value)-1], employees).total;
     const outOfPocket = Math.max(0, stageInv - wellnessFund);
     coverageEl.classList.remove('hidden');
     coverageEl.textContent = outOfPocket === 0
@@ -2355,15 +2473,42 @@ function buildPDFDoc(){
     doc.text('SERVICES INCLUDED',M,y);
     y+=7;
 
+    // Service list for the PDF. Built from the same calcInvestment breakdown
+    // the on-screen figure uses, so the proposal cannot state a price the
+    // calculator disagrees with. Descriptions come from the live rate card.
     const svc=[];
-    if(d.stage.workshops){const wsS=Math.ceil(Math.max(1,Math.round(d.employees*d.participRate))/WORKSHOP_WEBINAR_CAP);svc.push([(d.stage.workshops>1?d.stage.workshops+' Wellness Workshops':'1 Wellness Workshop')+(wsS>1?' × '+wsS+' sessions':''),'$1,500 per live webinar session (~'+WORKSHOP_WEBINAR_CAP+' attendees each)']);}
-    if(d.stage.challenges) svc.push([(d.stage.challenges>1?d.stage.challenges+' 14-Day Team Challenges':'1 14-Day Team Challenge'),'Tiered per-employee pricing  |  Daily habit-building program']);
-    if(d.stage.leq){const lq=Math.max(LEQ_MIN,Math.max(1,Math.round(d.employees*LEADER_FRACTION))*LEQ_PER_LEADER);svc.push(['Leadership EQ Series (3-part)','$'+lq.toLocaleString()+'  |  $'+LEQ_PER_LEADER+'/leader (min $'+LEQ_MIN.toLocaleString()+'), incl. 360 assessment and ROI report']);}
-    if(d.stage.groupCoaching) svc.push(['Group Coaching — '+Math.ceil(d.employees*0.16/12)+' cohorts','$5,000 per cohort  |  16% of workforce in coached groups of 12']);
-    if(d.stage.indivCoaching) svc.push(['Individual Coaching — '+Math.round(d.employees*0.05)+' leaders','$5,000 per leader  |  1:1 coaching for top 5% of staff']);
-    if(d.stage.consultant) svc.push(['Dedicated Wellness Consultant','$10,000  |  Strategic oversight and platform data access']);
-    const bLbl=d.stage.incentiveStage===3?'Wellness Boxes — Full Workforce':d.stage.incentiveStage===2?'Wellness Boxes — Per Challenge & Workshop':'Wellness Boxes — Per Workshop';
-    svc.push([bLbl,'$100 per box  |  Physical or digital options']);
+    const _sections = sectionsPerWorkshop(d.employees);
+    if(d.stage.workshops){
+      svc.push([
+        (d.stage.workshops>1?d.stage.workshops+' Wellness Workshops':'1 Wellness Workshop')+(_sections>1?' × '+_sections+' sections each':''),
+        _sections>1
+          ? '$'+RC.rates.workshopFirstSession.toLocaleString()+' first section, $'+RC.rates.workshopExtraSession.toLocaleString()+' each repeat (materials produced once)  |  run '+_sections+'× so every shift can attend'
+          : '$'+RC.rates.workshopFirstSession.toLocaleString()+' per section  |  up to '+RC.rates.maxAttendeesPerSession+' attendees'
+      ]);
+    }
+    if(d.stage.challenges){
+      const _slots = challengeSlots(d.employees);
+      svc.push([
+        (d.stage.challenges>1?d.stage.challenges+' 14-Day Team Challenges':'1 14-Day Team Challenge'),
+        _slots+' slots @ $'+challengeRatePerPerson(_slots)+'/person  |  daily habit-building program'
+      ]);
+    }
+    if(d.stage.leq){
+      const _leq = leadershipEqPrice(d.employees, { coachingBlocks: d.stage.coachingBlocks, lcpRounds: d.stage.lcpRounds });
+      svc.push([
+        'Leadership EQ Program',
+        '$'+_leq.total.toLocaleString()+'  |  $'+RC.rates.leqSeries.toLocaleString()+' series + '+_leq.groups+' coaching group'+(_leq.groups>1?'s':'')+' × '+_leq.coachingHours+' hrs + LCP for '+_leq.leaders+' leader'+(_leq.leaders>1?'s':'')
+      ]);
+    }
+    if(d.stage.consultant) svc.push(['Dedicated Wellness Consultant','Included  |  Strategic oversight and platform data access']);
+    {
+      const _boxes = RC.rates.boxesPerWorkshopSection * d.stage.workshops * _sections
+                   + RC.rates.boxesPerChallenge * d.stage.challenges;
+      svc.push([
+        'Wellness Boxes — '+_boxes+' total',
+        '$'+RC.rates.wellnessBox+' per box  |  '+RC.rates.boxesPerWorkshopSection+' per workshop'+(_sections>1?' section':'')+' + '+RC.rates.boxesPerChallenge+' per challenge  |  physical or digital options'
+      ]);
+    }
 
     svc.forEach(s=>{
       h2(DARK); doc.setFontSize(11);
@@ -2379,7 +2524,7 @@ function buildPDFDoc(){
     doc.text('INVESTMENT BREAKDOWN',M,y);
     y+=7;
 
-    const bk=calcInvestment(d.stage,d.employees,d.participRate).breakdown;
+    const bk=calcInvestment(d.stage,d.employees).breakdown;
     bk.forEach((item,i)=>{
       if(i%2===0){ doc.setFillColor(253,251,247); doc.rect(M,y-3,CW,8,'F'); }
       p(DARK);
@@ -2613,6 +2758,18 @@ function initApp(){
   ['inp-stress','inp-participation','inp-stage','inp-turnover','inp-absent','inp-eap'].forEach(id=>document.getElementById(id)?.addEventListener('input',runCalculator));
   syncParticipationToSize();
   runCalculator();
+
+  // Pull the live rate card from the app, then redraw with real prices.
+  // Until it lands the page shows the built-in snapshot, so nothing is blank.
+  (async () => {
+    const employeesNow = Math.max(1, parseInt(document.getElementById('inp-employees')?.value) || 250);
+    await loadRateCard(employeesNow);
+    verifyAgainstServer();
+    runCalculator();
+    if (RC_SOURCE !== 'live') {
+      console.warn('[rateCard] showing ' + RC_SOURCE + ' prices — the live feed did not respond');
+    }
+  })();
 }
 
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',initApp):initApp();
