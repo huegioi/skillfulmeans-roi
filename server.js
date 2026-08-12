@@ -34,12 +34,17 @@ app.post('/api/submit', async (req, res) => {
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
         range: 'ROI Leads!A1',
         valueInputOption: 'RAW',
-        requestBody: { values: [['Timestamp','First Name','Last Name','Email','Company','Phone','Employees','Avg Salary','Health Premium','Stress %','Participation %','Turnover %','Absence Days','EAP %','Investment','Medical','Absence','Presenteeism','Turnover','WC','Annual','3-Year','ROI %','Payback']] }
+        // 25 headers for 25 values. This was 24 — 'Wellness Fund' was being
+        // written but had no header, so everything from Medical rightwards sat
+        // one column left of its label. Rows written before 2026-08-12 are
+        // shifted; anything reading this sheet by column letter should account
+        // for that. 'Commitments' is APPENDED so no existing column moves.
+        requestBody: { values: [['Timestamp','First Name','Last Name','Email','Company','Phone','Employees','Avg Salary','Health Premium','Stress %','Participation %','Turnover %','Absence Days','EAP %','Investment','Wellness Fund','Medical','Absence','Presenteeism','Turnover','WC (retired)','Annual','3-Year','ROI %','Payback','Commitments']] }
       });
     }
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'ROI Leads!A:X',
+      range: 'ROI Leads!A:Z',
       valueInputOption: 'RAW',
       requestBody: { values: [[
         new Date().toISOString(),
@@ -48,8 +53,16 @@ app.post('/api/submit', async (req, res) => {
         data.stressRate, data.participRate, data.turnoverRate,
         data.absDays, data.eapPct, data.investment, data.wellnessFund||0,
         data.medSavings, data.absSavings, data.pressSavings,
-        data.turnoverSavings, data.wcSavings,
-        data.annualSavings, data.total3yr, data.netROI, data.paybackMonths
+        data.turnoverSavings,
+        // Always 0. The workers' comp driver was retired 2026-08-12 — no
+        // defensible published coefficient. Column kept so historical rows,
+        // formulas and filters keep working.
+        0,
+        data.annualSavings, data.total3yr, data.netROI, data.paybackMonths,
+        // Which of the four design conditions the employer said they could
+        // commit to. This is what actually determines participation now, so it
+        // is the most useful column in the sheet for qualifying a lead.
+        data.participationCommitments || ''
       ]] }
     });
     console.log('Google Sheets: success');
@@ -91,7 +104,7 @@ app.post('/api/submit', async (req, res) => {
       </div>
       <div class="body">
         <p style="font-size:15px;font-weight:600;margin-bottom:4px">Hi ${data.firstName},</p>
-        <p style="font-size:14px;color:#57534e;line-height:1.6;margin-top:4px">Here's your ROI analysis for a <strong>${parseInt(data.employees).toLocaleString()}-person workforce</strong> at ${Math.round(data.participRate)}% program participation. Your full PDF report is attached.</p>
+        <p style="font-size:14px;color:#57534e;line-height:1.6;margin-top:4px">Here's your ROI analysis for a <strong>${parseInt(data.employees).toLocaleString()}-person workforce</strong> at ${Math.round(data.participRate)}% projected participation${data.participationCommitments ? ` (${data.participationCommitments.split('+').filter(Boolean).length} of 4 design commitments)` : ''}. Your full PDF report is attached.</p>
         ${(data.wellnessFund > 0) ? `<div style="background:#f0fdf9;border:1px solid #6ee7b7;border-radius:10px;padding:10px 14px;font-size:12px;color:#065f46;margin:12px 0"><strong>Wellness Fund Available:</strong> $${Math.round(data.wellnessFund).toLocaleString()} — estimated out-of-pocket after funding: <strong>$${Math.max(0,Math.round((data.investment||0)-(data.wellnessFund||0))).toLocaleString()}</strong></div>` : ''}
 
         <div class="kpis">
@@ -101,15 +114,14 @@ app.post('/api/submit', async (req, res) => {
         </div>
 
         <div class="disclaimer">
-          <strong>Full Engagement Model:</strong> These figures reflect a complete SkillfulMeans program including Leadership EQ, workshops, 14-day challenges, and wellness incentives. Want to experience the quality before the full investment? A single workshop starts at $1,500.
+          <strong>How this was calculated:</strong> Four cost drivers, each from published research, counted only for the people the programme actually reaches. Participation isn&rsquo;t assumed — it follows from the design decisions selected, and the investment shown buys the capacity to serve it. No figure exceeds the highest return any published study reports for a whole-workforce programme. Want to experience the quality before the full investment? A single workshop starts at $1,500.
         </div>
 
         <p class="section-title">Annual Savings by Driver</p>
         <div class="dr"><span class="dr-label">Medical Claims Reduction</span><span class="dr-val">$${fmt(data.medSavings)}</span></div>
         <div class="dr"><span class="dr-label">Absenteeism Reduction</span><span class="dr-val">$${fmt(data.absSavings)}</span></div>
         <div class="dr"><span class="dr-label">Presenteeism Recovery</span><span class="dr-val">$${fmt(data.pressSavings)}</span></div>
-        <div class="dr"><span class="dr-label">Voluntary Turnover Reduction</span><span class="dr-val">$${fmt(data.turnoverSavings)}</span></div>
-        <div class="dr" style="border:none"><span class="dr-label">Workers&rsquo; Comp BH Comorbidity</span><span class="dr-val">$${fmt(data.wcSavings)}</span></div>
+        <div class="dr" style="border:none"><span class="dr-label">Voluntary Turnover Reduction</span><span class="dr-val">$${fmt(data.turnoverSavings)}</span></div>
         <div class="total-row"><span class="total-label">Projected Annual Savings</span><span class="total-val">$${fmt(data.annualSavings)}</span></div>
 
         <div class="pdf-note">📎 Your full 3-page analysis with study citations and next steps is attached to this email.</div>
